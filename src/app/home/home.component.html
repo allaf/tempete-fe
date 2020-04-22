@@ -1,0 +1,16 @@
+HOME COMP !<br>
+
+<h1>Hi {{currentUser.username}}!</h1>
+<h3>All registered users:</h3>
+<ul>
+    <li *ngFor="let user of users">
+        {{user.username}}
+    </li>
+</ul>
+
+<h1>games</h1>
+<ul>
+    <li *ngFor="let g of games">
+        {{g.name}}
+    </li>
+</ul>
