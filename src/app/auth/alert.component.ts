@@ -4,7 +4,8 @@ import { AlertService } from './alert.service';
 
 
 @Component({
-    selector: 'tempete-alert',
+    // tslint:disable-next-line: component-selector
+    selector: 'alert',
     template: '<div *ngIf="message" [ngClass]="message.cssClass">{{message.text}}</div>'
 })
 export class AlertComponent implements OnInit, OnDestroy {

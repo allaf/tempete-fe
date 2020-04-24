@@ -1,0 +1,8 @@
+<p>game works!</p>
+
+<div *ngIf="(game$ | async) else loading">
+  {{ (game$ | async)?.name }}
+</div>
+<ng-template #loading>
+    Loading...
+</ng-template>

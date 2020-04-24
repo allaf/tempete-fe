@@ -5,7 +5,4 @@ export class User {
   token: string;
 }
 
-export class Game {
-  id: number;
-  name: string;
-}
+

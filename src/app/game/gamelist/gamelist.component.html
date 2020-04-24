@@ -1,0 +1,14 @@
+<h3>parties en attente</h3>
+<ul class="list-group">
+  <li
+    *ngFor="let g of games | async"
+    (click)="onSelect(g)"
+    class="list-group-item list-group-item-action"
+  >
+    {{ g.name }}
+  </li>
+</ul>
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

@@ -1,9 +1,18 @@
 <!-- nav -->
-<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="currentUser">
+<nav
+  class="navbar navbar-expand navbar-dark bg-dark navbar-expand-lg justify-content-between"
+  *ngIf="currentUser | async"
+>
   <div class="navbar-nav">
     <a class="nav-item nav-link" routerLink="/">Home</a>
-    <a class="nav-item nav-link" (click)="logout()">Logout</a>
+    <a class="nav-item nav-link" routerLink="/" (click)="logout()">Logout</a>
   </div>
+  <div class="navbar-text">
+    Tempête sur l'échiquier online
+  </div>
+  <span class="navbar-text">
+    {{ (currentUser | async).username }}
+  </span>
 </nav>
 
 <!-- main app container -->
