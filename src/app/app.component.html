@@ -1,7 +1,7 @@
 <!-- nav -->
 <nav
   class="navbar navbar-expand navbar-dark bg-dark navbar-expand-lg justify-content-between"
-  *ngIf="currentUser | async"
+  *ngIf="currentUser | async as toto"
 >
   <div class="navbar-nav">
     <a class="nav-item nav-link" routerLink="/">Home</a>
@@ -11,7 +11,7 @@
     Tempête sur l'échiquier online
   </div>
   <span class="navbar-text">
-    {{ (currentUser | async).username }}
+    {{toto.username}}
   </span>
 </nav>
 

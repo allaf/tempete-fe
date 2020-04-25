@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Game } from '../game.model';
-import { ActivatedRoute, ParamMap, Params } from '@angular/router';
-
-import { switchMap, tap } from 'rxjs/operators';
-import { GameService } from '../game.service';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
+import { Game } from '../game.model';
+import { GameService } from '../game.service';
 
 @Component({
   selector: 'app-game',

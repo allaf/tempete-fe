@@ -11,10 +11,10 @@ export class AuthenticationService {
   private currentUserSubject: BehaviorSubject<User>;
   public currentUser: Observable<User>;
 
-  constructor(private backendService: BackendService,
-              private http: HttpClient
-
-    ) {
+  constructor(
+    private backendService: BackendService,
+    private http: HttpClient
+  ) {
     this.currentUserSubject = new BehaviorSubject<User>(
       JSON.parse(localStorage.getItem('currentUser'))
     );
@@ -26,10 +26,7 @@ export class AuthenticationService {
   }
 
   ping() {
-    this.backendService
-      .get('/ping')
-      .pipe(map(console.log))
-      .subscribe();
+    this.backendService.get('/ping').pipe(map(console.log)).subscribe();
   }
 
   login(username: string, password: string) {
@@ -49,8 +46,6 @@ export class AuthenticationService {
   logout() {
     // remove user from local storage and set current user to null
     localStorage.removeItem('currentUser');
-    console.log('xxx', localStorage.getItem('currentUser'));
-
     this.currentUserSubject.next(null);
   }
 }
