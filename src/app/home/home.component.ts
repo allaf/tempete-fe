@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '../auth/auth.service';
+import { AuthenticationService } from '../auth/authentication.service';
 import { User } from '../user/user.model';
+import { UserService } from '../user/user.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -8,13 +10,9 @@ import { User } from '../user/user.model';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  currentUser: User;
-  games = [];
 
   constructor(
-    private authenticationService: AuthenticationService,
   ) {
-    this.currentUser = this.authenticationService.currentUserValue;
   }
 
   ngOnInit() {}

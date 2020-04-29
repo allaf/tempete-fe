@@ -1,20 +1,21 @@
 <!-- nav -->
 <nav
   class="navbar navbar-expand navbar-dark bg-dark navbar-expand-lg justify-content-between"
-  *ngIf="currentUser | async as toto"
+  *ngIf="currentUser | async as currentUser"
 >
   <div class="navbar-nav">
     <a class="nav-item nav-link" routerLink="/">Home</a>
     <a class="nav-item nav-link" routerLink="/" (click)="logout()">Logout</a>
   </div>
   <div class="navbar-text">
-    Tempête sur l'échiquier online
+    {{ title }}
   </div>
   <span class="navbar-text">
-    {{toto.username}}
+    {{ currentUser.username }}
   </span>
 </nav>
 
+<!-- TODO better template sans jumbotron -->
 <!-- main app container -->
 <div class="jumbotron">
   <div class="container">

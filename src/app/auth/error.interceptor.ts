@@ -1,24 +1,56 @@
+import { HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { AuthenticationService } from './auth.service';
-
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-    constructor(private authenticationService: AuthenticationService) { }
+  private isRefreshing = false;
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
+    null
+  );
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return next.handle(request).pipe(catchError(err => {
-            if (err.status === 401) {
-                // auto logout if 401 response returned from api
-                this.authenticationService.logout();
-                location.reload();
-            }
+  constructor(
+    private router: Router,
+    private authService: AuthenticationService
+  ) {}
 
-            const error = err.error.message || err.statusText;
-            return throwError(error);
-        }));
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+    return next.handle(request).pipe(
+      catchError((error) => {
+        if (error.status === 401) {
+          console.log('intercept ERROR 401', request);
+          return this.handle401Error(request, next);
+        } else {
+          const errMsg = error.error.message || error.statusText;
+          return throwError(errMsg);
+        }
+      })
+    );
+  }
+
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler): any {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null);
+
+      return this.authService.refreshToken().pipe(
+        switchMap((token: any) => {
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(token.jwtToken);
+          return next.handle(this.authService.addToken(request, token.jwtToken));
+        })
+      );
+    } else {
+      return this.refreshTokenSubject.pipe(
+        filter((token) => token != null),
+        take(1),
+        switchMap((jwt) => {
+          return next.handle(this.authService.addToken(request, jwt));
+        })
+      );
     }
+  }
 }

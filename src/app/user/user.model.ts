@@ -2,7 +2,6 @@ export class User {
   id: number;
   password: string;
   username: string;
-  accessToken: string;
+  accessToken?: string;
+  refreshToken?: string;
 }
-
-

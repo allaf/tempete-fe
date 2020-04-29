@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Game } from '../game.model';
 import { GameService } from '../game.service';
-import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'tempete-gamelist',
@@ -17,11 +17,9 @@ export class GamelistComponent implements OnInit {
 
   ngOnInit(): void {
     this.games = this.gameService.getAllGames();
-    this.gameService.getAllGames().subscribe((x) => console.log(x));
   }
 
   onSelect(g: Game) {
-    console.log('selected', g);
     this.selectedGame = g;
     this.router.navigateByUrl('/game/' + g.id);
   }
