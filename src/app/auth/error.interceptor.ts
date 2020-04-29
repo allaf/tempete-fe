@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthenticationService } from './authentication.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
@@ -13,6 +14,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   );
 
   constructor(
+    private logger: NGXLogger,
     private router: Router,
     private authService: AuthenticationService
   ) {}
@@ -21,7 +23,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error) => {
         if (error.status === 401) {
-          console.log('intercept ERROR 401', request);
+          this.logger.debug('intercept ERROR 401', request); // TODO logger
           return this.handle401Error(request, next);
         } else {
           const errMsg = error.error.message || error.statusText;
@@ -35,15 +37,18 @@ export class ErrorInterceptor implements HttpInterceptor {
     if (!this.isRefreshing) {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
-
+      this.logger.debug('handle 401 is refreshing=true');
       return this.authService.refreshToken().pipe(
         switchMap((token: any) => {
+          this.logger.debug('afterrefresh token');
           this.isRefreshing = false;
           this.refreshTokenSubject.next(token.jwtToken);
           return next.handle(this.authService.addToken(request, token.jwtToken));
         })
       );
     } else {
+      this.logger.debug('handle 401 is refreshing=false');
+      this.authService.localLogout(); // ugly but works
       return this.refreshTokenSubject.pipe(
         filter((token) => token != null),
         take(1),
@@ -51,6 +56,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           return next.handle(this.authService.addToken(request, jwt));
         })
       );
+
     }
   }
 }

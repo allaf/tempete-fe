@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from '../auth/alert.service';
 import { AuthenticationService } from '../auth/authentication.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
@@ -12,6 +13,7 @@ export class LoginComponent implements OnInit {
   returnUrl: string;
 
   constructor(
+    private logger: NGXLogger,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
@@ -59,7 +61,7 @@ export class LoginComponent implements OnInit {
       .login(this.f.username.value, this.f.password.value)
       .subscribe(
         (data) => {
-          console.log('login ok redirecting to /');
+          this.logger.debug('login ok redirecting to /');
           this.router.navigate([this.returnUrl]);
         },
         (error) => {

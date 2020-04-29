@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from './auth/authentication.service';
 import { User } from './user/user.model';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({ selector: 'tempete-app', templateUrl: 'app.component.html' })
 export class AppComponent implements OnInit {
@@ -10,6 +11,7 @@ export class AppComponent implements OnInit {
   title = 'Tempête sur l\'échiquier online';
 
   constructor(
+    private logger: NGXLogger,
     private router: Router,
     private authenticationService: AuthenticationService
   ) {}
@@ -21,10 +23,10 @@ export class AppComponent implements OnInit {
   async logout() {
     const res = await this.authenticationService.logout().toPromise();
     if (res) {
-      console.log('logout fini OK je redirige vers login');
+      this.logger.debug('logout fini OK je redirige vers login');
       this.router.navigate(['/login']);
     } else {
-      console.log('logout fini ERROR je fais RIEN');
+      this.logger.debug('logout fini ERROR je fais RIEN');
     }
   }
 }
