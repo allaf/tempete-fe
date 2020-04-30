@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from './auth/authentication.service';
 import { User } from './user/user.model';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({ selector: 'tempete-app', templateUrl: 'app.component.html' })
 export class AppComponent implements OnInit {
+  title = `Tempête sur l'échiquier online`;
   currentUser: Observable<User>;
-  title = 'Tempête sur l\'échiquier online';
 
   constructor(
     private logger: NGXLogger,

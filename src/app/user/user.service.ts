@@ -12,4 +12,8 @@ export class UserService {
   getUser(id: string): Observable<User> {
     return this.backend.get('/users/' + id);
   }
+
+  getConnectedUsers(): Observable<User[]> {
+    return this.backend.get('/users/connected');
+  }
 }

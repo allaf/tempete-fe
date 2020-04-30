@@ -14,6 +14,7 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { UserModule } from './user/user.module';
 import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+import { UserListComponent } from './userlist/userlist.component';
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
     AlertComponent,
     GamelistComponent,
     GameComponent,
+    UserListComponent,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -13,8 +13,13 @@
     "component-class-suffix": true,
     "contextual-lifecycle": true,
     "directive-class-suffix": true,
-    "directive-selector": [true, "attribute", ["app","tempete"], "camelCase"],
-    "component-selector": [true, "element", ["","app","tempete"], "kebab-case"],
+    "directive-selector": [true, "attribute", ["app", "tempete"], "camelCase"],
+    "component-selector": [
+      true,
+      "element",
+      ["", "app", "tempete"],
+      "kebab-case"
+    ],
     "eofline": true,
     "import-blacklist": [true, "rxjs/Rx"],
     "import-spacing": true,
@@ -30,8 +35,11 @@
         "order": [
           "static-field",
           "instance-field",
+          "public-constructor",
           "static-method",
-          "instance-method"
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
         ]
       }
     ],

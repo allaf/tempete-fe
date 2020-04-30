@@ -18,9 +18,7 @@ export interface Tokens {
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-  localLogout() {
-    this.removeTokens();
-  }
+
   constructor(
     private logger: NGXLogger,
     private backendService: BackendService,
@@ -32,12 +30,11 @@ export class AuthenticationService {
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  currentUserSubject = new BehaviorSubject<User>(undefined);
-  public currentUser = this.currentUserSubject.asObservable();
-
   public get currentUserValue(): User {
     return this.currentUserSubject.value;
   }
+  currentUserSubject = new BehaviorSubject<User>(undefined);
+  public currentUser = this.currentUserSubject.asObservable();
 
   refreshToken() {
     return this.http
@@ -51,17 +48,8 @@ export class AuthenticationService {
       );
   }
 
-  private getRefreshToken() {
-    return localStorage.getItem(REFRESH_TOKEN);
-  }
-
-  private storeJwtToken(jwt: string) {
-    localStorage.setItem(JWT_TOKEN, jwt);
-  }
-
-  private storeTokens(tokens: Tokens) {
-    localStorage.setItem(JWT_TOKEN, tokens.jwtToken);
-    localStorage.setItem(REFRESH_TOKEN, tokens.refreshToken);
+  localLogout() {
+    this.removeTokens();
   }
 
   addToken(request: HttpRequest<any>, token: string) {
@@ -116,6 +104,19 @@ export class AuthenticationService {
           return of(false);
         })
       );
+  }
+
+  private getRefreshToken() {
+    return localStorage.getItem(REFRESH_TOKEN);
+  }
+
+  private storeJwtToken(jwt: string) {
+    localStorage.setItem(JWT_TOKEN, jwt);
+  }
+
+  private storeTokens(tokens: Tokens) {
+    localStorage.setItem(JWT_TOKEN, tokens.jwtToken);
+    localStorage.setItem(REFRESH_TOKEN, tokens.refreshToken);
   }
 
   private removeTokens() {
