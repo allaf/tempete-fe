@@ -1,5 +1,12 @@
 <div *ngIf="game$ | async as game; else loading">
   {{ game.name }}
+
+  <ng2-chessboard
+    [size]="'200px'"
+    [position]="'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R'"
+    [draggable]="true"
+    [orientation]="false"
+  ></ng2-chessboard>
 </div>
 <ng-template #loading>
   Loading game...

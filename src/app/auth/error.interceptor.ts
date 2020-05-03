@@ -23,7 +23,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error) => {
         if (error.status === 401) {
-          this.logger.debug('intercept ERROR 401', request); // TODO logger
+          this.logger.debug('intercept ERROR 401', request);
           return this.handle401Error(request, next);
         } else {
           const errMsg = error.error.message || error.statusText;

@@ -1,6 +1,6 @@
 <!-- nav -->
 <nav
-  class="navbar navbar-expand navbar-dark bg-dark navbar-expand-lg justify-content-between"
+  class="navbar fixed-top navbar-expand navbar-dark bg-dark navbar-expand-lg justify-content-between"
   *ngIf="currentUser | async as currentUser"
 >
   <div class="navbar-nav">
@@ -18,10 +18,11 @@
 <!-- TODO better template sans jumbotron -->
 <!-- main app container -->
 
-<!-- <alert></alert> -->
 <alert></alert>
-<!-- TODO alert flottant -->
 
-<div class="container-fluid">
-  <router-outlet></router-outlet>
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
 </div>

@@ -25,12 +25,21 @@
             "aot": true,
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/chessboardjs/www/releases/0.3.0/img",
+                "output": "/assets/"
+              }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/chessboardjs/www/releases/0.3.0/css/chessboard-0.3.0.min.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/chessboardjs/www/releases/0.3.0/js/chessboard-0.3.0.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -79,7 +88,7 @@
           "options": {
             "browserTarget": "tempete-fe:build"
           }
-        },       
+        },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
@@ -88,9 +97,7 @@
               "tsconfig.spec.json",
               "e2e/tsconfig.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {
@@ -106,6 +113,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "tempete-fe"
 }

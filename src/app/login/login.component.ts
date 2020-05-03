@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NGXLogger } from 'ngx-logger';
 import { AlertService } from '../auth/alert.service';
 import { AuthenticationService } from '../auth/authentication.service';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
@@ -11,6 +11,10 @@ export class LoginComponent implements OnInit {
   loading = false;
   submitted = false;
   returnUrl: string;
+
+  public users = 0;
+  public message = '';
+  public messages: string[] = [];
 
   constructor(
     private logger: NGXLogger,
@@ -20,7 +24,6 @@ export class LoginComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private alertService: AlertService
   ) {
-    // redirect to home if already logged in
     if (this.authenticationService.isLoggedIn()) {
       this.router.navigate(['/']);
     }

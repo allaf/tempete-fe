@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  backendUrl: 'http://localhost:3000'
+  backendUrl: 'http://localhost:3000',
+  wsUrl : 'http://localhost:3000',
+  useWSPRotocol: false,
 };
 
 export const config = environment;
