@@ -19,17 +19,8 @@ declare const ChessBoard: any;
 export class ChessboardComponent implements OnInit {
   board: any;
 
+  @Input()
   width = '300px';
-
-
-  @Input() size = '100px';
-
-  myStyle = {
-    // 'background-color': 'red',
-    // 'font-size': '5px',
-    // 'font-weight': 'bold',
-    width: this.size,
-  };
 
   private _position: any = 'start';
   private _orientation = true;
@@ -42,31 +33,10 @@ export class ChessboardComponent implements OnInit {
   private _snapSpeed: any = 100;
   private _sparePieces = false;
 
-  @Input() animation = true;
-  @Output() animationChange = new EventEmitter<boolean>();
-
-  @Output() positionChange = new EventEmitter<any>();
-  @Output() orientationChange = new EventEmitter<boolean>();
-  @Output() showNotationChange = new EventEmitter<boolean>();
-  @Output() draggableChange = new EventEmitter<boolean>();
-  @Output() dropOffBoardChange = new EventEmitter<string>();
-  @Output() pieceThemeChange = new EventEmitter();
-  @Output() moveSpeedChange = new EventEmitter<any>();
-  @Output() snapbackSpeedChange = new EventEmitter<any>();
-  @Output() snapSpeedChange = new EventEmitter<any>();
-  @Output() sparePiecesChange = new EventEmitter<boolean>();
-
-  // EVENTS
-  @Output() onchange = new EventEmitter();
-  @Output() dragStart = new EventEmitter();
-  @Output() dragMove = new EventEmitter();
-  @Output() ondrop = new EventEmitter();
-  @Output() snapbackEnd = new EventEmitter();
-  @Output() moveEnd = new EventEmitter();
-
   get dropOffBoard(): string {
     return this._dropOffBoard;
   }
+
   @Input()
   set dropOffBoard(value: string) {
     this._dropOffBoard = value;
@@ -186,6 +156,30 @@ export class ChessboardComponent implements OnInit {
     return this._sparePieces;
   }
 
+  @Input() animation = true;
+  @Output() animationChange = new EventEmitter<boolean>();
+
+  @Output() positionChange = new EventEmitter<any>();
+  @Output() orientationChange = new EventEmitter<boolean>();
+  @Output() showNotationChange = new EventEmitter<boolean>();
+  @Output() draggableChange = new EventEmitter<boolean>();
+  @Output() dropOffBoardChange = new EventEmitter<string>();
+  @Output() pieceThemeChange = new EventEmitter();
+  @Output() moveSpeedChange = new EventEmitter<any>();
+  @Output() snapbackSpeedChange = new EventEmitter<any>();
+  @Output() snapSpeedChange = new EventEmitter<any>();
+  @Output() sparePiecesChange = new EventEmitter<boolean>();
+
+  // EVENTS
+  @Output() change = new EventEmitter();
+  @Output() dragStart = new EventEmitter();
+  @Output() dragMove = new EventEmitter();
+  @Output() drop = new EventEmitter();
+  @Output() snapbackEnd = new EventEmitter();
+  @Output() moveEnd = new EventEmitter();
+
+  constructor() {}
+
   // PARAMETERS
 
   @HostListener('window:resize', ['$event'])
@@ -205,12 +199,15 @@ export class ChessboardComponent implements OnInit {
     this.board.move(notation);
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.load();
+    // ugly hack for the board size to be effective
+    await delay(0);
+    this.board.resize();
   }
 
   private onChangeHandler(oldPos: any, newPos: any) {
-    this.onchange.emit({ oldPos, newPos });
+    this.change.emit({ oldPos, newPos });
   }
 
   // PRIVATE
@@ -251,7 +248,7 @@ export class ChessboardComponent implements OnInit {
   ) {
     this._position = newPos;
     this.positionChange.emit(this._position);
-    this.ondrop.emit({ source, target, piece, newPos, oldPos, orientation });
+    this.drop.emit({ source, target, piece, newPos, oldPos, orientation });
   }
 
   private onSnapbackEnd(
@@ -290,4 +287,7 @@ export class ChessboardComponent implements OnInit {
       onMoveEnd: this.onMoveEnd.bind(this),
     });
   }
+}
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
