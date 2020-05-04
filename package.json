@@ -35,8 +35,8 @@
     "rxjs-websockets": "^8.0.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2",
-    "chessboardjs": "0.0.1",
-    "jquery": "^3.2.1"
+    "@chrisoakman/chessboardjs": "^1.0.0",
+    "jquery": "^3.4.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.901.0",

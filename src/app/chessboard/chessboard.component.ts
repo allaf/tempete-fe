@@ -27,7 +27,6 @@ export class ChessboardComponent implements OnInit {
   private _showNotation = true;
   private _draggable = false;
   private _dropOffBoard = 'snapback';
-  private _pieceTheme: any = 'assets/chesspieces/wikipedia/{piece}.png';
   private _moveSpeed: any = 200;
   private _snapbackSpeed: any = 500;
   private _snapSpeed: any = 100;
@@ -94,18 +93,18 @@ export class ChessboardComponent implements OnInit {
     }
     this.orientationChange.emit(this._orientation);
   }
-  get pieceTheme(): any {
-    return this._pieceTheme;
-  }
+  // get pieceTheme(): any {
+  //   return this._pieceTheme;
+  // }
 
-  @Input()
-  set pieceTheme(value: any) {
-    this._pieceTheme = value instanceof Function ? value() : value;
-    if (this.board) {
-      this.load();
-    }
-    this.pieceThemeChange.emit(this._pieceTheme);
-  }
+  // @Input()
+  // set pieceTheme(value: any) {
+  //   this._pieceTheme = value instanceof Function ? value() : value;
+  //   if (this.board) {
+  //     this.load();
+  //   }
+  //   this.pieceThemeChange.emit(this._pieceTheme);
+  // }
 
   get moveSpeed(): any {
     return this._moveSpeed;
@@ -273,7 +272,7 @@ export class ChessboardComponent implements OnInit {
       showNotation: this._showNotation,
       draggable: this._draggable,
       dropOffBoard: this._dropOffBoard,
-      pieceTheme: this._pieceTheme,
+      pieceTheme(piece) { return '/assets/pieces/cburnett/' + piece + '.svg'; },
       moveSpeed: this._moveSpeed,
       snapbackSpeed: this._snapbackSpeed,
       snapSpeed: this._snapSpeed,
