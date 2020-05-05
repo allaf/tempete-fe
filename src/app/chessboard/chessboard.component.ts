@@ -93,10 +93,11 @@ export class ChessboardComponent implements OnInit {
     }
     this.orientationChange.emit(this._orientation);
   }
+
+  // TODO utile ?
   // get pieceTheme(): any {
   //   return this._pieceTheme;
   // }
-
   // @Input()
   // set pieceTheme(value: any) {
   //   this._pieceTheme = value instanceof Function ? value() : value;
@@ -272,7 +273,9 @@ export class ChessboardComponent implements OnInit {
       showNotation: this._showNotation,
       draggable: this._draggable,
       dropOffBoard: this._dropOffBoard,
-      pieceTheme(piece) { return '/assets/pieces/cburnett/' + piece + '.svg'; },
+      pieceTheme(piece) {
+        return '/assets/pieces/cburnett/' + piece + '.svg';
+      },
       moveSpeed: this._moveSpeed,
       snapbackSpeed: this._snapbackSpeed,
       snapSpeed: this._snapSpeed,

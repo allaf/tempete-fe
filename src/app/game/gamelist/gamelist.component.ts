@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subject, ReplaySubject, BehaviorSubject } from 'rxjs';
 import { Game } from '../game.model';
 import { GameService } from '../game.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'tempete-gamelist',
@@ -10,17 +11,32 @@ import { GameService } from '../game.service';
   styleUrls: ['./gamelist.component.scss'],
 })
 export class GamelistComponent implements OnInit {
-  games: Observable<Game[]>;
-  selectedGame: Game;
+  gamesSubject = new BehaviorSubject<Game[]>(null);
+  wait = '';
+  // games: Observable<Game[]> = this.behaviorSubject.asObservable();
 
   constructor(private gameService: GameService, private router: Router) {}
 
   ngOnInit(): void {
-    this.games = this.gameService.getAllGames();
+    this.getGames();
   }
 
-  onSelect(g: Game) {
-    this.selectedGame = g;
-    this.router.navigateByUrl('/game/' + g.id);
+  getGames() {
+    return this.gameService.getAllGames().subscribe((value) => {
+      this.gamesSubject.next(value);
+    });
+  }
+
+  addGame() {
+    this.wait = '...';
+
+    this.gameService.addGame().subscribe((g) => {
+      this.getGames();
+      this.wait = '';
+    });
+  }
+
+  onSelect(game: Game) {
+    this.router.navigateByUrl('/game/' + game.id);
   }
 }

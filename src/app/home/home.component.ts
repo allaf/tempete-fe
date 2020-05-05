@@ -17,8 +17,6 @@ export class HomeComponent implements OnInit {
       this.users = users;
     });
 
-    this.homeService.getObs().subscribe(x => console.log('le sub', x));
-
   }
 
   sendEvent() {

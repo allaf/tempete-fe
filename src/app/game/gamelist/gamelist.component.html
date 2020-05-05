@@ -1,10 +1,20 @@
-<h3>parties en attente</h3>
+<h3>parties</h3>
+<button (click)="addGame()">Créer partie</button>
+{{ wait }}
 <ul class="list-group">
   <li
-    *ngFor="let g of games | async"
-    (click)="onSelect(g)"
+    *ngFor="let g of gamesSubject | async"
     class="list-group-item list-group-item-action"
   >
-    {{ g.name }}
+    <div class="container">
+      <div class="row">
+        <div class="col-10">
+          {{ g.name }}
+        </div>
+        <div class="col" (click)="onSelect(g)" style="cursor: pointer;">
+          <u>Jouer</u>
+        </div>
+      </div>
+    </div>
   </li>
 </ul>

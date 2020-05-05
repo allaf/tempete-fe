@@ -7,7 +7,7 @@ import { BackendService } from '../backend.service';
 export class HomeService {
   constructor(private backendService: BackendService) {}
 
-  getObs() {
-    return this.backendService.get('/obs');
-  }
+  // getObs() {
+    // return this.backendService.get('/obs');
+  // }
 }

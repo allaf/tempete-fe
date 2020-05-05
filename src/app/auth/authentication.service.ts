@@ -19,6 +19,12 @@ export interface Tokens {
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
 
+  public get currentUserValue(): User {
+    return this.currentUserSubject.value;
+  }
+  currentUserSubject = new BehaviorSubject<User>(undefined);
+  public currentUser = this.currentUserSubject.asObservable();
+
   constructor(
     private logger: NGXLogger,
     private backendService: BackendService,
@@ -29,12 +35,6 @@ export class AuthenticationService {
     );
     this.currentUser = this.currentUserSubject.asObservable();
   }
-
-  public get currentUserValue(): User {
-    return this.currentUserSubject.value;
-  }
-  currentUserSubject = new BehaviorSubject<User>(undefined);
-  public currentUser = this.currentUserSubject.asObservable();
 
   refreshToken() {
     return this.http
@@ -100,7 +100,7 @@ export class AuthenticationService {
         }),
         mapTo(true),
         catchError((error) => {
-          alert(error.error);
+          console.error(error.error);
           return of(false);
         })
       );
