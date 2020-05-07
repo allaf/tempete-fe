@@ -1,6 +1,16 @@
+<div class="container-fluid" >
+
+  <div class="row">a</div>
+  <div class="row">c</div>
+  <div class="row">s</div>
+
+</div>
+
+
 <div *ngIf="game$ | async as game; else loading">
   {{ game.name }}
-  {{game.boardFen}}
+
+  {{ game.status }}
 
   <ng2-chessboard
     [width]="'400px'"
@@ -8,6 +18,7 @@
     [draggable]="true"
     [orientation]="false"
   ></ng2-chessboard>
+  {{ game.boardFen }}
 </div>
 <ng-template #loading>
   Loading game...

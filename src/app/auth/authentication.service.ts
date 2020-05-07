@@ -1,11 +1,11 @@
 import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of, Observable } from 'rxjs';
-import { map, tap, mapTo, catchError } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, mapTo, tap } from 'rxjs/operators';
 import { config } from 'src/environments/environment';
 import { BackendService } from '../backend.service';
-import { User } from '../user/user.model';
-import { NGXLogger } from 'ngx-logger';
+import { User } from '../model/user.model';
 
 const JWT_TOKEN = 'JWT_TOKEN';
 const REFRESH_TOKEN = 'REFRESH_TOKEN';
@@ -18,10 +18,6 @@ export interface Tokens {
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-
-  public get currentUserValue(): User {
-    return this.currentUserSubject.value;
-  }
   currentUserSubject = new BehaviorSubject<User>(undefined);
   public currentUser = this.currentUserSubject.asObservable();
 
@@ -34,6 +30,14 @@ export class AuthenticationService {
       JSON.parse(localStorage.getItem(CURRENT_USER))
     );
     this.currentUser = this.currentUserSubject.asObservable();
+  }
+
+  public get currentUserValue(): User {
+    return this.currentUserSubject.value;
+  }
+
+  getConnectedUser(): User {
+    return this.currentUserValue;
   }
 
   refreshToken() {
@@ -100,7 +104,7 @@ export class AuthenticationService {
         }),
         mapTo(true),
         catchError((error) => {
-          console.error(error.error);
+          this.logger.error(error.error);
           return of(false);
         })
       );

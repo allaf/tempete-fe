@@ -1,20 +1,49 @@
-<h3>parties</h3>
-<button (click)="addGame()">Créer partie</button>
-{{ wait }}
-<ul class="list-group">
-  <li
-    *ngFor="let g of gamesSubject | async"
-    class="list-group-item list-group-item-action"
-  >
-    <div class="container">
-      <div class="row">
-        <div class="col-10">
-          {{ g.name }}
-        </div>
-        <div class="col" (click)="onSelect(g)" style="cursor: pointer;">
-          <u>Jouer</u>
+<div class="container justify-content-between">
+  <div class="row">
+    <div class="col-sm">
+      parties
+    </div>
+    <div class="col-sm">
+      <a class="" routerLink="/"  (click)="refreshList()">Refresh</a>
+    </div>
+    <div class="col-sm" style="text-align:'right'">
+      <button (click)="addGame()">Créer partie</button>
+    </div>
+  </div>
+</div>
+
+<div>
+  <ul class="list-group">
+    <li
+      *ngFor="let g of gamesSubject | async"
+      class="list-group-item list-group-item-action"
+    >
+      <div class="container">
+        <div class="row">
+          <div class="col-10">
+            {{ g.name }} - ({{g.status}})
+          </div>
+          <div
+            *ngIf="canJoin(g)"
+            class="col"
+            (click)="joinGame(g)"
+            style="cursor: pointer;"
+          >
+            <u>Jouer</u>
+          </div>
+          <div
+            *ngIf="canSee(g)"
+            class="col"
+            [routerLink]="'/game/'+g.id" 
+            style="cursor: pointer;"
+          >
+            <u>Jouer</u>
+          </div>
+
+          <div class="col" *ngIf="canDelete(g)"  (click)="deleteGame(g.id)"
+          style="cursor: pointer;">suppr</div>
         </div>
       </div>
-    </div>
-  </li>
-</ul>
+    </li>
+  </ul>
+</div>

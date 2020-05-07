@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subject, ReplaySubject, BehaviorSubject } from 'rxjs';
-import { Game } from '../game.model';
+import { BehaviorSubject } from 'rxjs';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { BackendService } from 'src/app/backend.service';
+import { Game, GameStatus } from '../../model/game.model';
 import { GameService } from '../game.service';
-import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'tempete-gamelist',
@@ -12,10 +13,13 @@ import { tap } from 'rxjs/operators';
 })
 export class GamelistComponent implements OnInit {
   gamesSubject = new BehaviorSubject<Game[]>(null);
-  wait = '';
-  // games: Observable<Game[]> = this.behaviorSubject.asObservable();
 
-  constructor(private gameService: GameService, private router: Router) {}
+  constructor(
+    private gameService: GameService,
+    private router: Router,
+    private authenticationService: AuthenticationService,
+    private backendService: BackendService
+  ) {}
 
   ngOnInit(): void {
     this.getGames();
@@ -28,15 +32,47 @@ export class GamelistComponent implements OnInit {
   }
 
   addGame() {
-    this.wait = '...';
-
     this.gameService.addGame().subscribe((g) => {
       this.getGames();
-      this.wait = '';
     });
   }
 
-  onSelect(game: Game) {
+  canJoin(game: Game): boolean {
+    const user = this.authenticationService.getConnectedUser();
+    return (
+      user.userId !== game.createdBy.userId && game.status === GameStatus.OPEN
+    );
+  }
+
+  canSee(game: Game): boolean {
+    const user = this.authenticationService.getConnectedUser();
+    return (
+      user.userId === game.blackPlayer.userId ||
+      user.userId === game.whitePlayer.userId
+    );
+  }
+
+  canDelete(game: Game): boolean {
+    const user = this.authenticationService.getConnectedUser();
+    return (
+      user.userId === game.createdBy.userId && game.status === GameStatus.OPEN
+    );
+  }
+
+  refreshList() {
+    this.getGames();
+  }
+
+  async joinGame(game) {
+    if (game.status === GameStatus.OPEN) {
+      await this.gameService.joinGame(game.id).toPromise();
+    }
     this.router.navigateByUrl('/game/' + game.id);
+  }
+
+  deleteGame(gameId) {
+    this.gameService.deleteGame(gameId).subscribe(() => {
+      this.refreshList();
+    });
   }
 }

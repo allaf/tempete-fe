@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
-import { Game } from '../game.model';
 import { GameService } from '../game.service';
+import { Game } from 'src/app/model/game.model';
 
 @Component({
   selector: 'app-game',
@@ -18,8 +18,8 @@ export class GameComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((x: Params) => {
-      this.game$ = this.gameService.getGame(x.get('id'));
+    this.route.paramMap.subscribe((r: Params) => {
+      this.game$ = this.gameService.getGame(r.get('id'));
     });
   }
 }

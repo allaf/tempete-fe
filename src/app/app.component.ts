@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from './auth/authentication.service';
-import { User } from './user/user.model';
+import { User } from './model/user.model';
 
 @Component({ selector: 'tempete-app', templateUrl: 'app.component.html' })
 export class AppComponent implements OnInit {

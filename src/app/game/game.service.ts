@@ -1,8 +1,9 @@
-import { Injectable, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { concatAll, map, share, tap } from 'rxjs/operators';
 import { BackendService } from '../backend.service';
-import { map, filter, first, concatAll, tap, share } from 'rxjs/operators';
-import { Game } from './game.model';
+import { Game, GameStatus } from '../model/game.model';
+import { User } from '../model/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,17 +18,25 @@ export class GameService {
     );
   }
 
+  joinGame(gameId): Observable<any> {
+    return this.backendService
+      .put('/game/' + gameId + '/join', null)
+      .pipe(tap((x) => console.log('join game =====>', x)));
+  }
+
+  deleteGame(gameId): Observable<any> {
+    return this.backendService
+      .delete('/game/' + gameId)
+      .pipe(tap((x) => console.log(' delete game =====>', x)));
+  }
+
   addGame() {
     return this.backendService.post('/game', null);
-    // Refresh gamelist
   }
 
   getGame(id: string): Observable<Game> {
-    console.log('getgame');
-    return this.games.pipe(
-      map((gameList: Game[]) => gameList.filter((g: Game) => g.id === id)),
-      concatAll()
-    );
+    // TODO 404 not found if null
+    return this.backendService.get('/game/' + id);
   }
 
   getAllGames(): Observable<Game[]> {
