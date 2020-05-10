@@ -2,10 +2,11 @@ import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, mapTo, tap } from 'rxjs/operators';
+import { catchError, mapTo, tap, share } from 'rxjs/operators';
 import { config } from 'src/environments/environment';
 import { BackendService } from '../backend.service';
 import { User } from '../model/user.model';
+import { Socket } from 'ngx-socket-io';
 
 const JWT_TOKEN = 'JWT_TOKEN';
 const REFRESH_TOKEN = 'REFRESH_TOKEN';
@@ -19,12 +20,13 @@ export interface Tokens {
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
   currentUserSubject = new BehaviorSubject<User>(undefined);
-  public currentUser = this.currentUserSubject.asObservable();
+  public currentUser = this.currentUserSubject.asObservable().pipe(share());
 
   constructor(
     private logger: NGXLogger,
     private backendService: BackendService,
-    private http: HttpClient
+    private http: HttpClient,
+    private socket: Socket
   ) {
     this.currentUserSubject = new BehaviorSubject<User>(
       JSON.parse(localStorage.getItem(CURRENT_USER))
@@ -128,4 +130,10 @@ export class AuthenticationService {
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.removeItem(JWT_TOKEN);
   }
+
+  // private tellWSServer() {
+    // this.socket.connect();
+    // manager.open;
+    // this.socket.emit('userConnect', this.currentUserValue.userId);
+  // }
 }

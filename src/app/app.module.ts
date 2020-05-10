@@ -22,6 +22,11 @@ import { UserListComponent } from './userlist/userlist.component';
 @NgModule({
   imports: [
     SocketIoModule.forRoot({
+      options: {
+        // TODO jwt secure
+        // autoConnect: false,
+        // query: { JWT_TOKEN: localStorage.getItem('JWT_TOKEN') },
+      },
       url: config.wsUrl,
     }),
     LoggerModule.forRoot({

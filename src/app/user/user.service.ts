@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BackendService } from '../backend.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { User } from '../model/user.model';
 
 @Injectable({
@@ -14,6 +14,7 @@ export class UserService {
   }
 
   getConnectedUsers(): Observable<User[]> {
-    return this.backend.get('/users/connected');
+    // return this.backend.get('/users/connected');
+    return of(null);
   }
 }

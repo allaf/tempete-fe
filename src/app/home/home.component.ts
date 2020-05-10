@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { ChatService } from '../chat/chat.service';
 import { HomeService } from './home.service';
 import { GamelistComponent } from '../game/gamelist/gamelist.component';
 
@@ -15,7 +14,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   // FIXME refresh list games on /home
   constructor(
-    private chatService: ChatService,
     private homeService: HomeService
   ) {}
 
@@ -24,12 +22,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.chatService.getUsers().subscribe((users: number) => {
-      this.users = users;
-    });
   }
 
-  sendEvent() {
-    this.chatService.sendEvent();
-  }
 }

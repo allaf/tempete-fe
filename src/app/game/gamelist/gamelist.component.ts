@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { BackendService } from 'src/app/backend.service';
 import { Game, GameStatus } from '../../model/game.model';
 import { GameService } from '../game.service';
 
@@ -17,8 +16,7 @@ export class GamelistComponent implements OnInit {
   constructor(
     private gameService: GameService,
     private router: Router,
-    private authenticationService: AuthenticationService,
-    private backendService: BackendService
+    private authenticationService: AuthenticationService
   ) {}
 
   ngOnInit(): void {
@@ -26,7 +24,7 @@ export class GamelistComponent implements OnInit {
   }
 
   getGames() {
-    return this.gameService.getAllGames().subscribe((value) => {
+    this.gameService.getAllGames().subscribe((value) => {
       this.gamesSubject.next(value);
     });
   }
@@ -47,8 +45,8 @@ export class GamelistComponent implements OnInit {
   canSee(game: Game): boolean {
     const user = this.authenticationService.getConnectedUser();
     return (
-      user.userId === game.blackPlayer.userId ||
-      user.userId === game.whitePlayer.userId
+      (game.whitePlayer && user.userId === game.whitePlayer.userId) ||
+      (game.blackPlayer && user.userId === game.blackPlayer.userId)
     );
   }
 

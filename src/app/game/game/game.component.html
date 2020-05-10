@@ -1,25 +1,32 @@
-<div class="container-fluid" >
-
-  <div class="row">a</div>
-  <div class="row">c</div>
-  <div class="row">s</div>
-
+<div *ngIf="gameSubject | async as game; else loading">
+  <button (click)="click()">click</button>
+  &nbsp;<strong>{{ game.turn }}</strong> &nbsp; white ({{
+    game.whitePlayer.username
+  }}) vs black ({{ game.blackPlayer?.username }})<br />
+  {{ game.turn }} to play
+  
+  <!-- (positionChange)="positionChange($event)" -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col">
+        <ng2-chessboard
+          (moveMade)="moveMade($event)"
+          [player]="playerColor"
+          [turn]="game.turn"
+          [width]="'400px'"
+          [position]="game.position"
+          [draggable]="true"
+          [orientation]="orientation"
+        ></ng2-chessboard>
+      </div>
+      <div class="col">
+        <pre>{{ game | json }}</pre>
+      </div>
+      <div class="col"></div>
+    </div>
+  </div>
 </div>
 
-
-<div *ngIf="game$ | async as game; else loading">
-  {{ game.name }}
-
-  {{ game.status }}
-
-  <ng2-chessboard
-    [width]="'400px'"
-    [position]="game.boardFen"
-    [draggable]="true"
-    [orientation]="false"
-  ></ng2-chessboard>
-  {{ game.boardFen }}
-</div>
 <ng-template #loading>
   Loading game...
 </ng-template>

@@ -9,7 +9,7 @@ export class ChatService {
   constructor(private socket: Socket) {}
 
   sendChat(message) {
-    this.socket.emit('chat', message);
+    this.socket.emit('test', message);
   }
 
   sendEvent() {

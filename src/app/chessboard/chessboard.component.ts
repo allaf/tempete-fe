@@ -8,6 +8,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { Turn } from '../model/game.model';
 
 declare const ChessBoard: any;
 
@@ -17,21 +18,6 @@ declare const ChessBoard: any;
   styleUrls: ['./chessboard.component.css'],
 })
 export class ChessboardComponent implements OnInit {
-  board: any;
-
-  @Input()
-  width = '300px';
-
-  private _position: any = 'start';
-  private _orientation = true;
-  private _showNotation = true;
-  private _draggable = false;
-  private _dropOffBoard = 'snapback';
-  private _moveSpeed: any = 200;
-  private _snapbackSpeed: any = 500;
-  private _snapSpeed: any = 100;
-  private _sparePieces = false;
-
   get dropOffBoard(): string {
     return this._dropOffBoard;
   }
@@ -155,7 +141,22 @@ export class ChessboardComponent implements OnInit {
   get sparePieces(): boolean {
     return this._sparePieces;
   }
+  board: any;
 
+  @Input()
+  width = '300px';
+
+  private _position: any = 'start';
+  private _orientation = true;
+  private _showNotation = true;
+  private _draggable = false;
+  private _dropOffBoard = 'snapback';
+  private _moveSpeed: any = 200;
+  private _snapbackSpeed: any = 500;
+  private _snapSpeed: any = 100;
+  private _sparePieces = false;
+
+  @Input() player: Turn; // TODO hmmm
   @Input() animation = true;
   @Output() animationChange = new EventEmitter<boolean>();
 
@@ -171,12 +172,16 @@ export class ChessboardComponent implements OnInit {
   @Output() sparePiecesChange = new EventEmitter<boolean>();
 
   // EVENTS
-  @Output() change = new EventEmitter();
+  @Output() changeEvent = new EventEmitter();
   @Output() dragStart = new EventEmitter();
   @Output() dragMove = new EventEmitter();
-  @Output() drop = new EventEmitter();
+  @Output() dropEvent = new EventEmitter();
   @Output() snapbackEnd = new EventEmitter();
   @Output() moveEnd = new EventEmitter();
+
+  @Output() moveMade = new EventEmitter();
+
+  @Input() turn: string;
 
   constructor() {}
 
@@ -207,7 +212,7 @@ export class ChessboardComponent implements OnInit {
   }
 
   private onChangeHandler(oldPos: any, newPos: any) {
-    this.change.emit({ oldPos, newPos });
+    this.changeEvent.emit({ oldPos, newPos });
   }
 
   // PRIVATE
@@ -217,7 +222,8 @@ export class ChessboardComponent implements OnInit {
     position: any,
     orientation: string
   ) {
-    this.dragStart.emit({ source, piece, position, orientation });
+    // TODO if game_over => false
+    return piece.startsWith(this.turn) && this.player === this.turn;
   }
 
   private onDragMove(
@@ -246,9 +252,25 @@ export class ChessboardComponent implements OnInit {
     oldPos: any,
     orientation: string
   ) {
+    this.dropEvent.emit({
+      source,
+      target,
+      piece,
+      newPos,
+      oldPos,
+      orientation,
+    });
+
+    console.log('ONDROP', source);
     this._position = newPos;
-    this.positionChange.emit(this._position);
-    this.drop.emit({ source, target, piece, newPos, oldPos, orientation });
+    // this.positionChange.emit(this._position);
+
+    if (source === target) {
+      return;
+    }
+    // TODO validate move
+    // TODO check promotion
+    this.moveMade.emit({ source, target });
   }
 
   private onSnapbackEnd(
@@ -288,6 +310,8 @@ export class ChessboardComponent implements OnInit {
       onSnapbackEnd: this.onSnapbackEnd.bind(this),
       onMoveEnd: this.onMoveEnd.bind(this),
     });
+
+    console.log('====>', this.board.dropOffBoard, this.board._dropOffBoard);
   }
 }
 function delay(ms: number) {

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { concatAll, map, share, tap } from 'rxjs/operators';
+import { map, share, tap } from 'rxjs/operators';
 import { BackendService } from '../backend.service';
-import { Game, GameStatus } from '../model/game.model';
-import { User } from '../model/user.model';
+import { Game } from '../model/game.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService {
+
   games: Observable<Game[]>;
 
   constructor(private backendService: BackendService) {
@@ -16,6 +16,10 @@ export class GameService {
       map((g) => g),
       share()
     );
+  }
+
+  handleUpdate(x: any) {
+
   }
 
   joinGame(gameId): Observable<any> {
