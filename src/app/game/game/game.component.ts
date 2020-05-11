@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Scavenger } from '@wishtack/rx-scavenger';
 import { Socket } from 'ngx-socket-io';
 import { BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, share, filter } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Game, GameUpdate, Turn } from 'src/app/model/game.model';
 import { GameService } from '../game.service';
@@ -38,8 +38,10 @@ export class GameComponent implements OnInit, OnDestroy {
     private gameService: GameService,
     private socket: Socket
   ) {
-    // const chess = new Chess();
-    // console.log(chess.ascii(), chess.move('e4'));
+    this.gameSubject.pipe(filter((xx) => !!xx)).subscribe((xxx) => {
+      this.game.position = xxx.position;
+      this.chess = new Chess(xxx.position); // FIXME faire dans le resultat du next
+    });
   }
 
   ngOnDestroy(): void {}
@@ -58,12 +60,13 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   handleGameChange(x: Game) {
-    console.log('i know the game has been changed by someone !!!!!!');
-
     if (this.game.id === x.id) {
+      console.log('maj du game que j affiche', x);
       this.gameSubject.next(x);
       this.game.position = x.position;
-      this.chess = new Chess(x.position);
+      this.chess = new Chess(x.position); // FIXME faire dans le resultat du next
+    } else {
+      console.log('ce jeu n est pas le mien', this.game.id, x.id);
     }
   }
 
@@ -82,17 +85,20 @@ export class GameComponent implements OnInit, OnDestroy {
   // }
 
   moveMade(move) {
-    this.chess.move({
+    // update the game and send it to server
+    const mv = this.chess.move({
       from: move.source,
       to: move.target,
       promotion: null,
     });
+
+    console.log('MV', mv);
     this.game.turn = this.chess.turn();
     this.game.fenHistory.push(this.chess.fen());
     this.game.fenPointer++;
     this.game.position = this.chess.fen();
 
-    // TODO prevenir les autres clients et le serveur du move via WS
+    // Prevenir les autres clients et le serveur du move via WS
     this.socket.emit('gameChange', this.game);
   }
 

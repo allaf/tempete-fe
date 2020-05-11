@@ -7,7 +7,7 @@ import { GameComponent } from './game/game/game.component';
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'game/:id', component: GameComponent/*, canActivate: [AuthGuard]*/ }, // TODO routing guards 
+  { path: 'game/:id', component: GameComponent, canActivate: [AuthGuard] }, // TODO routing guards
   { path: '**', redirectTo: '' },
 ];
 

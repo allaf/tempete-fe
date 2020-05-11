@@ -8,7 +8,6 @@ import { Game } from '../model/game.model';
   providedIn: 'root',
 })
 export class GameService {
-
   games: Observable<Game[]>;
 
   constructor(private backendService: BackendService) {
@@ -18,20 +17,16 @@ export class GameService {
     );
   }
 
-  handleUpdate(x: any) {
-
-  }
+  handleUpdate(x: any) {}
 
   joinGame(gameId): Observable<any> {
     return this.backendService
       .put('/game/' + gameId + '/join', null)
-      .pipe(tap((x) => console.log('join game =====>', x)));
+      .pipe(tap());
   }
 
   deleteGame(gameId): Observable<any> {
-    return this.backendService
-      .delete('/game/' + gameId)
-      .pipe(tap((x) => console.log(' delete game =====>', x)));
+    return this.backendService.delete('/game/' + gameId).pipe(tap());
   }
 
   addGame() {

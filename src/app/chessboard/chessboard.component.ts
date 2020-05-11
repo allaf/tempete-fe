@@ -311,7 +311,6 @@ export class ChessboardComponent implements OnInit {
       onMoveEnd: this.onMoveEnd.bind(this),
     });
 
-    console.log('====>', this.board.dropOffBoard, this.board._dropOffBoard);
   }
 }
 function delay(ms: number) {
