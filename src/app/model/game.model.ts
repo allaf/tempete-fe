@@ -29,6 +29,7 @@ export class Game {
   changeTurn() {
     this.turn = this.turn === Turn.W ? Turn.B : Turn.W;
   }
+
 }
 
 export enum Turn {
