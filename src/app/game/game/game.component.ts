@@ -3,12 +3,12 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Scavenger } from '@wishtack/rx-scavenger';
 import { Socket } from 'ngx-socket-io';
 import { BehaviorSubject, of } from 'rxjs';
-import { catchError, filter, tap, map } from 'rxjs/operators';
+import { catchError, filter, map, tap } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Game, MoveMade, Turn } from 'src/app/model/game.model';
 import { GameService } from '../game.service';
 
-const Chess = require('chess.js');
+// const Chess = require('chess.js');
 
 declare const ChessBoard: any;
 
@@ -30,7 +30,9 @@ export class GameComponent implements OnInit, OnDestroy {
 
   orientation: boolean;
 
-  private chess; // = new Chess();
+  // private chess; // not necessary right now
+  private mapAsGame = map((res) => Object.assign(new Game(), res as Game));
+
   playerColor: Turn;
 
   randFen = '4k1nr/4bppp/8/8/8/8/P3K1PP/R6R b - - 0 16';
@@ -42,12 +44,8 @@ export class GameComponent implements OnInit, OnDestroy {
     private gameService: GameService,
     private socket: Socket
   ) {
-    let newFen = ChessBoard.objToFen({});
-    console.log('FEN', newFen);
-
     this.gameSubject.pipe(filter((xx) => !!xx)).subscribe((xxx) => {
       this.game.position = xxx.position;
-      this.chess = new Chess(xxx.position);
       // FIXME faire dans le resultat du next
     });
   }
@@ -59,10 +57,12 @@ export class GameComponent implements OnInit, OnDestroy {
       this.fetchGame(r.get('id'));
     });
 
-    this.gameChangeObs = this.socket.fromEvent('gameChange').pipe(
+    let op2 = (this.gameChangeObs = this.socket.fromEvent('gameChange').pipe(
       this.scavenger.collect(),
+      this.mapAsGame,
+      tap((x) => console.log('instanceof ?', x instanceof Game)),
       tap((x: Game) => this.handleGameChange(x))
-    );
+    ));
 
     this.gameChangeObs.subscribe();
   }
@@ -71,7 +71,6 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.game.id === x.id) {
       this.gameSubject.next(x);
       this.game.position = x.position;
-      this.chess = new Chess(x.position); // FIXME faire dans le resultat du next
     } else {
       console.log('ce jeu n est pas le mien', this.game.id, x.id);
     }
@@ -84,26 +83,15 @@ export class GameComponent implements OnInit, OnDestroy {
 
   moveMade(move: MoveMade) {
     // update the game and send it to server
-    // let newFen = this.gameService.convertPosToFen(move.newPos);
-
-    console.log("move",move)
-    let newFen = Chessboard.objToFen(move.newPos);
-
-    const mv = this.chess.move({
-      from: move.source,
-      to: move.target,
-      promotion: null,
-    });
-
-    console.log('MV', mv, newFen);
-    // this.game.changeTurn();
-    // this.game.toto();
-    // this.game.fenHistory.push(newFen);
-    // this.game.fenPointer++;
-    // this.game.position = newFen;
+    let newFen = ChessBoard.objToFen(move.newPos);
+    console.log('move', move, newFen);
+    this.game.changeTurn();
+    this.game.fenHistory.push(newFen);
+    this.game.fenPointer++;
+    this.game.position = newFen;
 
     // Prevenir les autres clients et le serveur du move via WS
-    // this.socket.emit('gameChange', this.game);
+    this.socket.emit('gameChange', this.game);
   }
 
   private fetchGame(id) {
@@ -115,13 +103,12 @@ export class GameComponent implements OnInit, OnDestroy {
           if (val === 'Not Found') this.router.navigate(['/']);
           return of(null);
         }),
-        map((res) => Object.assign(new Game(), res as Game))
+        this.mapAsGame
       )
       .subscribe((g: Game) => {
         // TODO init ?
         this.gameSubject.next(g);
         this.orientation = g.whitePlayer.userId === this.connectedUser.userId;
-        this.chess = new Chess(g.position);
         this.playerColor =
           this.game.whitePlayer.userId === this.connectedUser.userId
             ? Turn.W

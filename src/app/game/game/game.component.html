@@ -1,10 +1,12 @@
 <div *ngIf="gameSubject | async as game; else loading">
-  <button (click)="click()">click</button>
-  &nbsp;<strong>{{ game.turn }}</strong> &nbsp; white ({{
-    game.whitePlayer.username
-  }}) vs black ({{ game.blackPlayer?.username }})<br />
-  {{ game.turn }} to play
-  
+  <div style="padding-left: 20px;"> 
+    <button (click)="click()">click</button>
+    &nbsp;<strong>{{ game.turn }}</strong> &nbsp; white ({{
+      game.whitePlayer.username
+    }}) vs black ({{ game.blackPlayer?.username }})<br />
+    {{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play
+  </div>
+
   <!-- (positionChange)="positionChange($event)" -->
   <div class="container-fluid">
     <div class="row">
