@@ -262,6 +262,7 @@ export class ChessboardComponent implements OnInit {
     });
 
     console.log('ONDROP', source);
+    
     this._position = newPos;
     // this.positionChange.emit(this._position);
 
@@ -270,7 +271,10 @@ export class ChessboardComponent implements OnInit {
     }
     // TODO validate move
     // TODO check promotion
-    this.moveMade.emit({ source, target });
+    
+    console.log('ONDROP newPos', newPos);
+
+    this.moveMade.emit({ source, target , newPos});
   }
 
   private onSnapbackEnd(

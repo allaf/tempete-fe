@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { HomeService } from './home.service';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { GamelistComponent } from '../game/gamelist/gamelist.component';
+import { HomeService } from './home.service';
 
 @Component({
   selector: 'app-home',
@@ -12,16 +12,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   @ViewChild(GamelistComponent) child: GamelistComponent;
 
-  // FIXME refresh list games on /home
-  constructor(
-    private homeService: HomeService
-  ) {}
+  constructor(private homeService: HomeService) {}
 
   ngAfterViewInit(): void {
-    this.child.refreshList();
+    // FIXME crado non ?
+    // this.child.refreshList();
   }
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

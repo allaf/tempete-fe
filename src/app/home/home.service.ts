@@ -5,9 +5,5 @@ import { BackendService } from '../backend.service';
   providedIn: 'root',
 })
 export class HomeService {
-  constructor(private backendService: BackendService) {}
-
-  // getObs() {
-    // return this.backendService.get('/obs');
-  // }
+  constructor() {}
 }

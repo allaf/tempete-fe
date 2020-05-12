@@ -1,9 +1,9 @@
 import { HttpClientModule } from '@angular/common/http';
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { GamelistComponent } from '../game/gamelist/gamelist.component';
 import { HomeComponent } from './home.component';
-import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+import { SocketIoModule, Socket } from 'ngx-socket-io';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;

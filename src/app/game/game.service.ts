@@ -1,3 +1,4 @@
+import { HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, share, tap } from 'rxjs/operators';
@@ -34,11 +35,11 @@ export class GameService {
   }
 
   getGame(id: string): Observable<Game> {
-    // TODO 404 not found if null
-    return this.backendService.get('/game/' + id);
+    return this.backendService.get('/game/' + id).pipe();
   }
 
   getAllGames(): Observable<Game[]> {
     return this.games;
   }
+
 }

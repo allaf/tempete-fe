@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { config } from '../environments/environment';
@@ -8,6 +8,10 @@ import { tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class BackendService {
   constructor(private http: HttpClient) {}
+
+  headers: HttpHeaders = new HttpHeaders({
+    'Content-Type': 'application/json',
+  });
 
   put(url: string, body: any | null, options?: any) {
     return this.http.put(config.backendUrl + url, body, options);
@@ -19,11 +23,12 @@ export class BackendService {
   }
 
   get(url: string, options?: any): Observable<any> {
-    return this.http.get(config.backendUrl + url, options);
+    return this.http.get(config.backendUrl + url, {
+      headers: this.headers,
+    });
   }
 
   delete(url: string, body?: any | null, options?: any) {
     return this.http.delete(config.backendUrl + url, options);
   }
-
 }
