@@ -4,7 +4,8 @@ export enum GameStatus {
   OPEN = 'OPEN',
   PAIRED = 'PAIRED',
   STARTED = 'STARTED',
-  FINISHED = 'FINISHED',
+  FINISHED_MATE = 'FINISHED_MATE',
+  FINISHED_RESIGN = 'FINISHED_RESIGN',
 }
 
 export class Game {
@@ -29,7 +30,6 @@ export class Game {
   changeTurn() {
     this.turn = this.turn === Turn.W ? Turn.B : Turn.W;
   }
-
 }
 
 export enum Turn {

@@ -1,18 +1,21 @@
 <div *ngIf="gameSubject | async as game; else loading">
-  <div style="padding-left: 20px;"> 
-    <button (click)="click()">click</button>
-    &nbsp;<strong>{{ game.turn }}</strong> &nbsp; white ({{
-      game.whitePlayer.username
-    }}) vs black ({{ game.blackPlayer?.username }})<br />
-    {{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play
+  <div style="padding-left: 20px;">
+    <button (click)="resign()" [disabled]="!isMyTurn()">Resign</button><br />
+    {{ game.whitePlayer.username }} (white) vs
+    {{ game.blackPlayer?.username }} (black)<br />
+    <div *ngIf="game.status === 'FINISHED_RESIGN'">RESIGNED !</div>
+    <div *ngIf="game.status === 'FINISHED_MATE'">CHECKMATE !</div>
+    <strong *ngIf="game.status === 'STARTED'"
+      >{{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play</strong
+    >
   </div>
 
-  <!-- (positionChange)="positionChange($event)" -->
   <div class="container-fluid">
     <div class="row">
       <div class="col">
         <ng2-chessboard
           (moveMade)="moveMade($event)"
+          [gameStatus]="game.status"
           [player]="playerColor"
           [turn]="game.turn"
           [width]="'400px'"

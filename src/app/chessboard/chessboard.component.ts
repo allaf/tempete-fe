@@ -8,7 +8,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { Turn } from '../model/game.model';
+import { Turn, GameStatus } from '../model/game.model';
 
 declare const ChessBoard: any;
 
@@ -182,6 +182,7 @@ export class ChessboardComponent implements OnInit {
   @Output() moveMade = new EventEmitter();
 
   @Input() turn: string;
+  @Input() gameStatus: GameStatus;
 
   constructor() {}
 
@@ -215,83 +216,6 @@ export class ChessboardComponent implements OnInit {
     this.changeEvent.emit({ oldPos, newPos });
   }
 
-  // PRIVATE
-  private onDragStart(
-    source: string,
-    piece: string,
-    position: any,
-    orientation: string
-  ) {
-    // TODO if game_over => false
-    return piece.startsWith(this.turn) && this.player === this.turn;
-  }
-
-  private onDragMove(
-    newLocation: any,
-    oldLocation: any,
-    source: string,
-    piece: string,
-    position: any,
-    orientation: string
-  ) {
-    this.dragMove.emit({
-      newLocation,
-      oldLocation,
-      source,
-      piece,
-      position,
-      orientation,
-    });
-  }
-
-  private onDrop(
-    source: string,
-    target: string,
-    piece: string,
-    newPos: any,
-    oldPos: any,
-    orientation: string
-  ) {
-    this.dropEvent.emit({
-      source,
-      target,
-      piece,
-      newPos,
-      oldPos,
-      orientation,
-    });
-
-    console.log('ONDROP', source);
-    
-    this._position = newPos;
-    // this.positionChange.emit(this._position);
-
-    if (source === target) {
-      return;
-    }
-    // TODO validate move
-    // TODO check promotion
-    
-    console.log('ONDROP newPos', newPos);
-
-    this.moveMade.emit({ source, target , newPos});
-  }
-
-  private onSnapbackEnd(
-    piece: string,
-    square: string,
-    position: any,
-    orientation: string
-  ) {
-    this.snapbackEnd.emit({ piece, square, position, orientation });
-  }
-
-  private onMoveEnd(oldPos: any, newPos: any) {
-    this._position = newPos;
-    this.positionChange.emit(this._position);
-    this.moveEnd.emit({ oldPos, newPos });
-  }
-
   private load() {
     this.board = ChessBoard('ng2-board', {
       position: this._position,
@@ -314,9 +238,86 @@ export class ChessboardComponent implements OnInit {
       onSnapbackEnd: this.onSnapbackEnd.bind(this),
       onMoveEnd: this.onMoveEnd.bind(this),
     });
+  }
 
+  private onDragStart(
+    source: string,
+    piece: string,
+    position: any,
+    orientation: string
+  ) {
+    return (
+      piece.startsWith(this.turn) &&
+      this.player === this.turn &&
+      this.gameStatus !== GameStatus.FINISHED_RESIGN &&
+      this.gameStatus !== GameStatus.FINISHED_MATE
+    );
+  }
+
+  private onDrop(
+    source: string,
+    target: string,
+    piece: string,
+    newPos: any,
+    oldPos: any,
+    orientation: string
+  ) {
+    this.dropEvent.emit({
+      source,
+      target,
+      piece,
+      newPos,
+      oldPos,
+      orientation,
+    });
+
+    this._position = newPos;
+
+    if (source === target) {
+      return;
+    }
+    // TODO validate move
+    // TODO check promotion
+
+    console.log('ONDROP newPos', newPos);
+
+    this.moveMade.emit({ source, target, newPos });
+  }
+
+  private onDragMove(
+    newLocation: any,
+    oldLocation: any,
+    source: string,
+    piece: string,
+    position: any,
+    orientation: string
+  ) {
+    this.dragMove.emit({
+      newLocation,
+      oldLocation,
+      source,
+      piece,
+      position,
+      orientation,
+    });
+  }
+
+  private onSnapbackEnd(
+    piece: string,
+    square: string,
+    position: any,
+    orientation: string
+  ) {
+    this.snapbackEnd.emit({ piece, square, position, orientation });
+  }
+
+  private onMoveEnd(oldPos: any, newPos: any) {
+    this._position = newPos;
+    this.positionChange.emit(this._position);
+    this.moveEnd.emit({ oldPos, newPos });
   }
 }
+
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

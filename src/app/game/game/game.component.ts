@@ -5,12 +5,13 @@ import { Socket } from 'ngx-socket-io';
 import { BehaviorSubject, of } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { Game, MoveMade, Turn } from 'src/app/model/game.model';
+import { Game, MoveMade, Turn, GameStatus } from 'src/app/model/game.model';
 import { GameService } from '../game.service';
+import { Chess } from 'chess.js';
 
 // const Chess = require('chess.js');
 
-declare const ChessBoard: any;
+declare const ChessBoard: any;// TODO put in game service
 
 @Component({
   selector: 'app-game',
@@ -18,12 +19,11 @@ declare const ChessBoard: any;
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit, OnDestroy {
-  get game() {
-    return this.gameSubject.value;
-  }
+
   readonly connectedUser = this.auth.getConnectedUser();
 
   private scavenger = new Scavenger(this);
+  private mapAsGame = map((res) => Object.assign(new Game(), res as Game));
 
   gameSubject = new BehaviorSubject<Game>(null);
   gameChangeObs;
@@ -31,8 +31,7 @@ export class GameComponent implements OnInit, OnDestroy {
   orientation: boolean;
 
   // private chess; // not necessary right now
-  private mapAsGame = map((res) => Object.assign(new Game(), res as Game));
-
+  
   playerColor: Turn;
 
   randFen = '4k1nr/4bppp/8/8/8/8/P3K1PP/R6R b - - 0 16';
@@ -50,40 +49,49 @@ export class GameComponent implements OnInit, OnDestroy {
     });
   }
 
+  get game() {
+    return this.gameSubject.value;
+  }
+
   ngOnDestroy(): void {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((r: Params) => {
-      this.fetchGame(r.get('id'));
+    this.route.paramMap.subscribe((p: Params) => {
+      this.fetchGame(p.get('id'));
     });
 
     let op2 = (this.gameChangeObs = this.socket.fromEvent('gameChange').pipe(
       this.scavenger.collect(),
       this.mapAsGame,
-      tap((x) => console.log('instanceof ?', x instanceof Game)),
+      // tap((x) => console.log('instanceof ?', x instanceof Game)),
       tap((x: Game) => this.handleGameChange(x))
     ));
 
     this.gameChangeObs.subscribe();
   }
 
-  handleGameChange(x: Game) {
-    if (this.game.id === x.id) {
-      this.gameSubject.next(x);
-      this.game.position = x.position;
+  handleGameChange(g: Game) {
+    if (this.game.id === g.id) {
+      this.gameSubject.next(g);
+      this.game.position = g.position;
     } else {
-      console.log('ce jeu n est pas le mien', this.game.id, x.id);
+      console.log('ce jeu n est pas le mien', this.game.id, g.id);
     }
   }
 
-  click() {
-    console.log('click');
-    this.game.position = this.randFen;
+  resign() {
+    console.log('clicked on Resign');
+    this.game.status = GameStatus.FINISHED_RESIGN;
+    this.socket.emit('gameChange', this.game);
+  }
+
+  isMyTurn() {
+    return this.game.turn === this.getPlayerColor();
   }
 
   moveMade(move: MoveMade) {
     // update the game and send it to server
-    let newFen = ChessBoard.objToFen(move.newPos);
+    const newFen = ChessBoard.objToFen(move.newPos);
     console.log('move', move, newFen);
     this.game.changeTurn();
     this.game.fenHistory.push(newFen);
@@ -114,6 +122,12 @@ export class GameComponent implements OnInit, OnDestroy {
             ? Turn.W
             : Turn.B;
       });
+  }
+
+  private getPlayerColor() {
+    return this.game.whitePlayer.userId === this.connectedUser.userId
+      ? Turn.W
+      : Turn.B;
   }
 
   // private init(g: Game) {}
