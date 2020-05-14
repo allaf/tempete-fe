@@ -19,10 +19,55 @@ declare const ChessBoard: any;
   styleUrls: ['./chessboard.component.scss'],
 })
 export class ChessboardComponent implements OnInit, AfterViewInit {
+  board: any;
+  @Input() animation = true;
+  @Input() width = '300px';
+
+  private _position: any = 'start';
+  private _orientation = true;
+  private _showNotation = true;
+  private _draggable = false;
+  private _dropOffBoard = 'snapback';
+  private _moveSpeed: any = 200;
+  private _snapbackSpeed: any = 500;
+  private _snapSpeed: any = 100;
+  private _sparePieces = false;
+  private _move: SquareMove;
+
+  @Output() animationChange = new EventEmitter<boolean>();
+
+  @Output() positionChange = new EventEmitter<any>();
+  @Output() orientationChange = new EventEmitter<boolean>();
+  @Output() showNotationChange = new EventEmitter<boolean>();
+  @Output() draggableChange = new EventEmitter<boolean>();
+  @Output() dropOffBoardChange = new EventEmitter<string>();
+  @Output() pieceThemeChange = new EventEmitter();
+  @Output() moveSpeedChange = new EventEmitter<any>();
+  @Output() snapbackSpeedChange = new EventEmitter<any>();
+  @Output() snapSpeedChange = new EventEmitter<any>();
+  @Output() sparePiecesChange = new EventEmitter<boolean>();
+
+  // EVENTS
+  @Output() changeEvent = new EventEmitter();
+  @Output() dragStart = new EventEmitter();
+  @Output() dragMove = new EventEmitter();
+  @Output() dropEvent = new EventEmitter();
+  @Output() snapEnd = new EventEmitter();
+  @Output() moveEnd = new EventEmitter();
+
+  //////////////
+  @Output() moveMade = new EventEmitter();
+  @Input() player: Turn;
+  @Input() turn: string;
+  @Input() gameStatus: GameStatus;
+  @Input() lockPieces: boolean;
+  //////////////
+
+  // SETTERS
   @Input()
   set lastMove(value: SquareMove) {
-    this._lastMove = value;
-    if (this.board) {
+    this._move = value;
+    if (this.board && !!value) {
       this.highlightSquares(value.source, value.target);
     }
   }
@@ -107,52 +152,6 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
     this.sparePiecesChange.emit(this._sparePieces);
   }
 
-  board: any;
-  
-  @Input() animation = true;
-
-  @Input()
-  width = '300px';
-
-  private _position: any = 'start';
-  private _orientation = true;
-  private _showNotation = true;
-  private _draggable = false;
-  private _dropOffBoard = 'snapback';
-  private _moveSpeed: any = 200;
-  private _snapbackSpeed: any = 500;
-  private _snapSpeed: any = 100;
-  private _sparePieces = false;
-  private _lastMove: SquareMove;
-
-  @Output() animationChange = new EventEmitter<boolean>();
-
-  @Output() positionChange = new EventEmitter<any>();
-  @Output() orientationChange = new EventEmitter<boolean>();
-  @Output() showNotationChange = new EventEmitter<boolean>();
-  @Output() draggableChange = new EventEmitter<boolean>();
-  @Output() dropOffBoardChange = new EventEmitter<string>();
-  @Output() pieceThemeChange = new EventEmitter();
-  @Output() moveSpeedChange = new EventEmitter<any>();
-  @Output() snapbackSpeedChange = new EventEmitter<any>();
-  @Output() snapSpeedChange = new EventEmitter<any>();
-  @Output() sparePiecesChange = new EventEmitter<boolean>();
-
-  // EVENTS
-  @Output() changeEvent = new EventEmitter();
-  @Output() dragStart = new EventEmitter();
-  @Output() dragMove = new EventEmitter();
-  @Output() dropEvent = new EventEmitter();
-  @Output() snapEnd = new EventEmitter();
-  @Output() moveEnd = new EventEmitter();
-
-  //////////////
-  @Output() moveMade = new EventEmitter();
-  @Input() player: Turn;
-  @Input() turn: string;
-  @Input() gameStatus: GameStatus;
-  //////////////
-
   // GETTER
   get snapbackSpeed(): any {
     return this._snapbackSpeed;
@@ -161,7 +160,7 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
     return this._moveSpeed;
   }
   get lastMove() {
-    return this._lastMove;
+    return this._move;
   }
   get snapSpeed(): any {
     return this._snapSpeed;
@@ -188,7 +187,7 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
 
   constructor() {}
   ngAfterViewInit(): void {
-    console.log('ngAfterViewInit', this.lastMove);
+    console.log('ngAfterViewInit chessboard comp', this.lastMove);
   }
 
   @HostListener('window:resize', ['$event'])
@@ -259,7 +258,10 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
     position: any,
     orientation: string
   ) {
+    console.log('lock du chesscomp', this.lockPieces);
+
     return (
+      !this.lockPieces &&
       piece.startsWith(this.turn) &&
       this.player === this.turn &&
       this.gameStatus !== GameStatus.FINISHED_RESIGN &&

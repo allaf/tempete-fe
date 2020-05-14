@@ -1,22 +1,14 @@
 <div *ngIf="gameSubject | async as game; else loading">
-  <div style="padding-left: 20px;">
-    <button (click)="resign()" [disabled]="!isMyTurn()">Resign</button><br />
-    {{ game.whitePlayer.username }} (white) vs
-    {{ game.blackPlayer?.username }} (black)<br />
-    <div *ngIf="game.status === 'FINISHED_RESIGN'">RESIGNED !</div>
-    <div *ngIf="game.status === 'FINISHED_MATE'">CHECKMATE !</div>
-    <strong *ngIf="game.status === 'STARTED' || game.status === 'OPEN'"
-      >{{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play</strong
-    >
-  </div>
-
-  <div class="container-fluid">
+  <div class="container pt-3">
     <div class="row">
       <div class="col">
+        lockpieces ?{{ lockPieces }}
+        {{ game.fenPointer < game.fenHistory.length - 1 }}
         <ng2-chessboard
           (moveMade)="moveMade($event)"
           [gameStatus]="game.status"
-          [lastMove]="game.lastMove"
+          [lockPieces]="lockPieces"
+          [lastMove]="game.move"
           [player]="playerColor"
           [turn]="game.turn"
           [width]="'400px'"
@@ -26,9 +18,35 @@
         ></ng2-chessboard>
       </div>
       <div class="col">
+        <div style="padding-left: 20px;">
+          <button (click)="resign()" [disabled]="!isMyTurn()">Resign</button
+          ><br />
+          <button
+            (click)="showPreviousPosition()"
+            [disabled]="game.fenPointer === 0"
+          >
+            Previous
+          </button>
+          <button
+            (click)="showNextPosition()"
+            [disabled]="game.fenPointer === game.fenHistory.length - 1"
+          >
+            Next</button
+          ><br />
+          {{ game.whitePlayer.username }} (white) vs
+          {{ game.blackPlayer?.username }} (black)<br />
+          <strong>
+            <div *ngIf="game.status === 'FINISHED_RESIGN'">RESIGNED !</div>
+            <div *ngIf="game.status === 'FINISHED_MATE'">CHECKMATE !</div>
+            <div *ngIf="game.status === 'STARTED' || game.status === 'OPEN'">
+              {{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play
+            </div>
+          </strong>
+        </div>
+      </div>
+      <div class="col" style="border-left: 1px red;">
         <pre>{{ game | json }}</pre>
       </div>
-      <div class="col"></div>
     </div>
   </div>
 </div>

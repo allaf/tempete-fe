@@ -32,6 +32,7 @@ export class GameComponent implements OnInit, OnDestroy {
   playerColor: Turn;
 
   randFen = '4k1nr/4bppp/8/8/8/8/P3K1PP/R6R b - - 0 16';
+  lockPieces = false;
 
   constructor(
     private router: Router,
@@ -40,14 +41,10 @@ export class GameComponent implements OnInit, OnDestroy {
     private gameService: GameService,
     private socket: Socket
   ) {
-    this.gameSubject.pipe(filter((xx) => !!xx)).subscribe((xxx) => {
-      this.game.position = xxx.position;
-      // FIXME faire dans le resultat du next
+    this.gameSubject.pipe(filter((g) => !!g)).subscribe((g) => {
+      this.game.position = g.position;
+      // TODO ?? update lockPieces ?
     });
-  }
-
-  get game() {
-    return this.gameSubject.value;
   }
 
   ngOnDestroy(): void {}
@@ -85,17 +82,56 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   moveMade(move: MoveMade) {
-    // update the game and send it to server
+    // Gpdate the game and send it to the server
     const newFen = ChessBoard.objToFen(move.newPos);
     console.log('move', move, newFen);
     this.game.changeTurn();
     this.game.fenHistory.push(newFen);
     this.game.fenPointer++;
     this.game.position = newFen;
-    this.game.lastMove = { source: move.source, target: move.target };
+    this.game.move = { source: move.source, target: move.target };
 
     // Prevenir les autres clients et le serveur du move via WS
     this.socket.emit('gameChange', this.game);
+  }
+
+  showPreviousPosition() {
+    if (this.game.fenPointer === 0) {
+      return;
+    }
+    this.game.fenPointer--;
+    this.showFenPointer();
+    this.lockPieces = true;
+  }
+
+  showNextPosition() {
+    if (this.game.fenPointer === this.game.fenHistory.length - 1) {
+      return;
+    }
+    this.game.fenPointer++;
+    this.showFenPointer();
+
+    this.lockPieces = this.game.fenPointer < this.game.fenHistory.length - 1;
+  }
+
+  get game() {
+    return this.gameSubject.value;
+  }
+
+  private showFenPointer() {
+    this.cleanHighlights();
+    // if (this.configuration.playSounds) {
+    // this.playAudio('move');
+    // }
+    this.game.position = this.game.fenHistory[this.game.fenPointer];
+    this.game.move = this.game.moveHistory[this.game.fenPointer - 1];
+  }
+
+  private cleanHighlights() {
+    // TODO put in  ServiceUtils
+    document.querySelectorAll('.highlight-square').forEach((square) => {
+      square.classList.remove('highlight-square');
+    });
   }
 
   private fetchGame(id) {
