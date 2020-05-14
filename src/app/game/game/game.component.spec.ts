@@ -25,7 +25,7 @@ describe('GameComponent', () => {
         SocketIoModule,
       ],
       declarations: [GameComponent],
-      providers: [{ provide: Socket, useValue: SocketMock }], //TODO necessary?
+      providers: [{ provide: Socket, useValue: SocketMock }]
     }).compileComponents();
   }));
 

@@ -13,9 +13,17 @@ describe('LoginComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, HttpClientTestingModule, LoggerTestingModule, SocketIoModule],
+      imports: [
+        RouterTestingModule,
+        HttpClientTestingModule,
+        LoggerTestingModule,
+        SocketIoModule,
+      ],
       declarations: [LoginComponent],
-      providers: [FormBuilder,{ provide: Socket, useValue: { fromEvent: jest.fn() } }],
+      providers: [
+        FormBuilder,
+        { provide: Socket, useValue: { fromEvent: jest.fn() } },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

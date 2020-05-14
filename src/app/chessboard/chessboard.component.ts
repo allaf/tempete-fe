@@ -1,5 +1,5 @@
-// tslint:disable-next-line: no-output-native
 // tslint:disable: variable-name
+// tslint:disable: adjacent-overload-signatures
 import {
   Component,
   EventEmitter,
@@ -7,19 +7,24 @@ import {
   Input,
   OnInit,
   Output,
+  AfterViewInit,
 } from '@angular/core';
-import { Turn, GameStatus } from '../model/game.model';
+import { GameStatus, SquareMove, Turn } from '../model/game.model';
 
 declare const ChessBoard: any;
 
 @Component({
   selector: 'ng2-chessboard',
   templateUrl: './chessboard.component.html',
-  styleUrls: ['./chessboard.component.css'],
+  styleUrls: ['./chessboard.component.scss'],
 })
-export class ChessboardComponent implements OnInit {
-  get dropOffBoard(): string {
-    return this._dropOffBoard;
+export class ChessboardComponent implements OnInit, AfterViewInit {
+  @Input()
+  set lastMove(value: SquareMove) {
+    this._lastMove = value;
+    if (this.board) {
+      this.highlightSquares(value.source, value.target);
+    }
   }
 
   @Input()
@@ -31,10 +36,6 @@ export class ChessboardComponent implements OnInit {
     this.dropOffBoardChange.emit(this._dropOffBoard);
   }
 
-  get draggable(): boolean {
-    return this._draggable;
-  }
-
   @Input()
   set draggable(value: boolean) {
     this._draggable = value;
@@ -43,9 +44,7 @@ export class ChessboardComponent implements OnInit {
     }
     this.draggableChange.emit(this._draggable);
   }
-  get showNotation(): boolean {
-    return this._showNotation;
-  }
+
   @Input()
   set showNotation(value: boolean) {
     this._showNotation = value;
@@ -55,20 +54,12 @@ export class ChessboardComponent implements OnInit {
     this.showNotationChange.emit(this._showNotation);
   }
 
-  get position(): any {
-    return this._position;
-  }
-
   @Input()
   set position(value: any) {
     this._position = value;
     if (this.board) {
       this.board.position(value, this.animation);
     }
-  }
-
-  get orientation(): boolean {
-    return this._orientation;
   }
 
   @Input()
@@ -80,23 +71,6 @@ export class ChessboardComponent implements OnInit {
     this.orientationChange.emit(this._orientation);
   }
 
-  // TODO utile ?
-  // get pieceTheme(): any {
-  //   return this._pieceTheme;
-  // }
-  // @Input()
-  // set pieceTheme(value: any) {
-  //   this._pieceTheme = value instanceof Function ? value() : value;
-  //   if (this.board) {
-  //     this.load();
-  //   }
-  //   this.pieceThemeChange.emit(this._pieceTheme);
-  // }
-
-  get moveSpeed(): any {
-    return this._moveSpeed;
-  }
-
   @Input()
   set moveSpeed(value: any) {
     this._moveSpeed = value;
@@ -104,9 +78,6 @@ export class ChessboardComponent implements OnInit {
       this.load();
     }
     this.moveSpeedChange.emit(this._moveSpeed);
-  }
-  get snapbackSpeed(): any {
-    return this._snapbackSpeed;
   }
 
   @Input()
@@ -116,9 +87,6 @@ export class ChessboardComponent implements OnInit {
       this.load();
     }
     this.snapbackSpeedChange.emit(this._snapbackSpeed);
-  }
-  get snapSpeed(): any {
-    return this._snapSpeed;
   }
 
   @Input()
@@ -138,10 +106,10 @@ export class ChessboardComponent implements OnInit {
     }
     this.sparePiecesChange.emit(this._sparePieces);
   }
-  get sparePieces(): boolean {
-    return this._sparePieces;
-  }
+
   board: any;
+  
+  @Input() animation = true;
 
   @Input()
   width = '300px';
@@ -155,9 +123,8 @@ export class ChessboardComponent implements OnInit {
   private _snapbackSpeed: any = 500;
   private _snapSpeed: any = 100;
   private _sparePieces = false;
+  private _lastMove: SquareMove;
 
-  @Input() player: Turn; // TODO hmmm
-  @Input() animation = true;
   @Output() animationChange = new EventEmitter<boolean>();
 
   @Output() positionChange = new EventEmitter<any>();
@@ -176,23 +143,60 @@ export class ChessboardComponent implements OnInit {
   @Output() dragStart = new EventEmitter();
   @Output() dragMove = new EventEmitter();
   @Output() dropEvent = new EventEmitter();
-  @Output() snapbackEnd = new EventEmitter();
+  @Output() snapEnd = new EventEmitter();
   @Output() moveEnd = new EventEmitter();
 
+  //////////////
   @Output() moveMade = new EventEmitter();
-
+  @Input() player: Turn;
   @Input() turn: string;
   @Input() gameStatus: GameStatus;
+  //////////////
+
+  // GETTER
+  get snapbackSpeed(): any {
+    return this._snapbackSpeed;
+  }
+  get moveSpeed(): any {
+    return this._moveSpeed;
+  }
+  get lastMove() {
+    return this._lastMove;
+  }
+  get snapSpeed(): any {
+    return this._snapSpeed;
+  }
+  get sparePieces(): boolean {
+    return this._sparePieces;
+  }
+  get orientation(): boolean {
+    return this._orientation;
+  }
+  get dropOffBoard(): string {
+    return this._dropOffBoard;
+  }
+  get position(): any {
+    return this._position;
+  }
+  get showNotation(): boolean {
+    return this._showNotation;
+  }
+  get draggable(): boolean {
+    return this._draggable;
+  }
+  // /GETTER
 
   constructor() {}
-
-  // PARAMETERS
+  ngAfterViewInit(): void {
+    console.log('ngAfterViewInit', this.lastMove);
+  }
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    if (this.board) {
-      this.board.resize(event);
-    }
+    // if (this.board) {
+    // this.board.resize(event);
+    // this.highlightLastMove()
+    // }
   }
 
   // METHODS
@@ -207,9 +211,12 @@ export class ChessboardComponent implements OnInit {
 
   async ngOnInit() {
     this.load();
-    // ugly hack for the board size to be effective
-    await delay(0);
+
+    // ugly hack for the board resize to be effective
+    await new Promise((r) => setTimeout(r, 0));
     this.board.resize();
+
+    this.highlightLastMove();
   }
 
   private onChangeHandler(oldPos: any, newPos: any) {
@@ -235,9 +242,15 @@ export class ChessboardComponent implements OnInit {
       onChange: this.onChangeHandler.bind(this),
       onDragMove: this.onDragMove.bind(this),
       onDrop: this.onDrop.bind(this),
-      onSnapbackEnd: this.onSnapbackEnd.bind(this),
+      onSnapEnd: this.onSnapEnd.bind(this),
       onMoveEnd: this.onMoveEnd.bind(this),
     });
+  }
+
+  private highlightLastMove() {
+    if (this.lastMove) {
+      this.highlightSquares(this.lastMove.source, this.lastMove.target);
+    }
   }
 
   private onDragStart(
@@ -273,14 +286,11 @@ export class ChessboardComponent implements OnInit {
 
     this._position = newPos;
 
-    if (source === target) {
+    if (source === target || target === 'offboard') {
       return;
     }
-    // TODO validate move
+    // TODO validate move with crazy rule... ?
     // TODO check promotion
-
-    console.log('ONDROP newPos', newPos);
-
     this.moveMade.emit({ source, target, newPos });
   }
 
@@ -292,6 +302,7 @@ export class ChessboardComponent implements OnInit {
     position: any,
     orientation: string
   ) {
+    this.cleanHighlights();
     this.dragMove.emit({
       newLocation,
       oldLocation,
@@ -302,13 +313,36 @@ export class ChessboardComponent implements OnInit {
     });
   }
 
-  private onSnapbackEnd(
-    piece: string,
-    square: string,
-    position: any,
-    orientation: string
+  private onSnapEnd(
+    source: string, // e2
+    target: string, // e4
+    piece: any // wP,bP
   ) {
-    this.snapbackEnd.emit({ piece, square, position, orientation });
+    this.snapEnd.emit({ source, target, piece });
+    // le reste est fait de base par chessboardjs
+    // this.highlightSquares(source, target);
+    // console.log('onSnapEnd ===> ', source, target, piece);
+  }
+
+  private cleanHighlights() {
+    document.querySelectorAll('.highlight-square').forEach((square) => {
+      square.classList.remove('highlight-square');
+    });
+  }
+
+  private highlightSquares(source, target) {
+    this.cleanHighlights();
+    this.addClass('.square-' + source);
+    this.addClass('.square-' + target);
+  }
+
+  private addClass(square: string) {
+    const el = document.querySelector(square);
+    if (el) {
+      el.classList.add('highlight-square');
+    } else {
+      console.log(square, 'notfound');
+    }
   }
 
   private onMoveEnd(oldPos: any, newPos: any) {
@@ -316,8 +350,4 @@ export class ChessboardComponent implements OnInit {
     this.positionChange.emit(this._position);
     this.moveEnd.emit({ oldPos, newPos });
   }
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

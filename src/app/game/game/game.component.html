@@ -5,7 +5,7 @@
     {{ game.blackPlayer?.username }} (black)<br />
     <div *ngIf="game.status === 'FINISHED_RESIGN'">RESIGNED !</div>
     <div *ngIf="game.status === 'FINISHED_MATE'">CHECKMATE !</div>
-    <strong *ngIf="game.status === 'STARTED'"
+    <strong *ngIf="game.status === 'STARTED' || game.status === 'OPEN'"
       >{{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play</strong
     >
   </div>
@@ -16,6 +16,7 @@
         <ng2-chessboard
           (moveMade)="moveMade($event)"
           [gameStatus]="game.status"
+          [lastMove]="game.lastMove"
           [player]="playerColor"
           [turn]="game.turn"
           [width]="'400px'"

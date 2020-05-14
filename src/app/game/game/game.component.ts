@@ -11,7 +11,7 @@ import { Chess } from 'chess.js';
 
 // const Chess = require('chess.js');
 
-declare const ChessBoard: any;// TODO put in game service
+declare const ChessBoard: any; // TODO put in game service
 
 @Component({
   selector: 'app-game',
@@ -19,7 +19,6 @@ declare const ChessBoard: any;// TODO put in game service
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent implements OnInit, OnDestroy {
-
   readonly connectedUser = this.auth.getConnectedUser();
 
   private scavenger = new Scavenger(this);
@@ -30,8 +29,6 @@ export class GameComponent implements OnInit, OnDestroy {
 
   orientation: boolean;
 
-  // private chess; // not necessary right now
-  
   playerColor: Turn;
 
   randFen = '4k1nr/4bppp/8/8/8/8/P3K1PP/R6R b - - 0 16';
@@ -60,12 +57,11 @@ export class GameComponent implements OnInit, OnDestroy {
       this.fetchGame(p.get('id'));
     });
 
-    let op2 = (this.gameChangeObs = this.socket.fromEvent('gameChange').pipe(
+    this.gameChangeObs = this.socket.fromEvent('gameChange').pipe(
       this.scavenger.collect(),
       this.mapAsGame,
-      // tap((x) => console.log('instanceof ?', x instanceof Game)),
       tap((x: Game) => this.handleGameChange(x))
-    ));
+    );
 
     this.gameChangeObs.subscribe();
   }
@@ -75,12 +71,11 @@ export class GameComponent implements OnInit, OnDestroy {
       this.gameSubject.next(g);
       this.game.position = g.position;
     } else {
-      console.log('ce jeu n est pas le mien', this.game.id, g.id);
+      console.error('Not my game', this.game.id, g.id);
     }
   }
 
   resign() {
-    console.log('clicked on Resign');
     this.game.status = GameStatus.FINISHED_RESIGN;
     this.socket.emit('gameChange', this.game);
   }
@@ -97,6 +92,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.game.fenHistory.push(newFen);
     this.game.fenPointer++;
     this.game.position = newFen;
+    this.game.lastMove = { source: move.source, target: move.target };
 
     // Prevenir les autres clients et le serveur du move via WS
     this.socket.emit('gameChange', this.game);
@@ -108,7 +104,9 @@ export class GameComponent implements OnInit, OnDestroy {
       .pipe(
         this.scavenger.collect(),
         catchError((val) => {
-          if (val === 'Not Found') this.router.navigate(['/']);
+          if (val === 'Not Found') {
+            this.router.navigate(['/']);
+          }
           return of(null);
         }),
         this.mapAsGame
