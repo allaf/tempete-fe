@@ -12,6 +12,7 @@ import {
 import { GameStatus, SquareMove, Turn } from '../model/game.model';
 
 declare const ChessBoard: any;
+const Chess = require('chess.js');
 
 @Component({
   selector: 'ng2-chessboard',
@@ -61,6 +62,7 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
   @Input() turn: string;
   @Input() gameStatus: GameStatus;
   @Input() lockPieces: boolean;
+  @Input() gamePosition: string;
   //////////////
 
   // SETTERS
@@ -260,13 +262,53 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
   ) {
     console.log('lock du chesscomp', this.lockPieces);
 
-    return (
+    const moveok =
       !this.lockPieces &&
       piece.startsWith(this.turn) &&
       this.player === this.turn &&
       this.gameStatus !== GameStatus.FINISHED_RESIGN &&
-      this.gameStatus !== GameStatus.FINISHED_MATE
-    );
+      this.gameStatus !== GameStatus.FINISHED_MATE;
+
+    if (moveok) {
+      this.drawGreySquares(source);
+    }
+    return moveok;
+  }
+
+  private drawGreySquares(square) {
+    // get list of possible moves for this square
+    const moves = new Chess(this.gamePosition).moves({ square, verbose: true });
+    // exit if there are no moves available for this square
+    if (moves.length === 0) {
+      return;
+    }
+
+    console.log('possible squares for ', square, moves);
+
+    // highlight the square they moused over
+    this.greySquare(square);
+    // highlight the possible squares for this piece
+    moves.forEach((move) => {
+      this.greySquare(move.to);
+    });
+  }
+
+  private greySquare(square) {
+    const squareEl = document.querySelector(`#ng2-board .square-${square}`);
+    if (squareEl.classList.contains('black-3c85d')) {
+      squareEl.classList.add('move-dest-black');
+    } else {
+      squareEl.classList.add('move-dest-white');
+    }
+  }
+
+  private removeGreySquares() {
+    document.querySelectorAll('.move-dest-black').forEach((el) => {
+      el.classList.remove('move-dest-black');
+    });
+    document.querySelectorAll('.move-dest-white').forEach((el) => {
+      el.classList.remove('move-dest-white');
+    });
   }
 
   private onDrop(
@@ -285,13 +327,18 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
       oldPos,
       orientation,
     });
-
-    this._position = newPos;
-
-    if (source === target || target === 'offboard') {
-      return;
+    this.removeGreySquares();
+    let newMove = new Chess(this.gamePosition).move({
+      from: source,
+      to: target,
+      promotion: 'q',
+    });
+    console.log('ISLEGAL', newMove);
+    if (source === target || target === 'offboard' || newMove === null) {
+      console.warn('bad drop');
+      return 'snapback'
     }
-    // TODO validate move with crazy rule... ?
+    this._position = newPos;
     // TODO check promotion
     this.moveMade.emit({ source, target, newPos });
   }

@@ -6,6 +6,7 @@
         {{ game.fenPointer < game.fenHistory.length - 1 }}
         <ng2-chessboard
           (moveMade)="moveMade($event)"
+          [gamePosition]="game.position"
           [gameStatus]="game.status"
           [lockPieces]="lockPieces"
           [lastMove]="game.move"
@@ -42,6 +43,9 @@
               {{ game.turn === 'b' ? 'BLACK' : 'WHITE' }} to play
             </div>
           </strong>
+          <div>
+            {{ game.position }}
+          </div>
         </div>
       </div>
       <div class="col" style="border-left: 1px red;">
