@@ -12,7 +12,7 @@ export class BackendService {
   }
 
   post(url: string, body: any | null, options?: any) {
-    console.log('post', config.backendUrl + url);
+    console.log('post', config.backendUrl + url, body);
     return this.http.post(config.backendUrl + url, body, options);
   }
 

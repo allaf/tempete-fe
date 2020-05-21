@@ -10,6 +10,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { GameStatus, SquareMove, Turn } from '../model/game.model';
+import { BackendService } from '../backend.service';
 
 declare const ChessBoard: any;
 const Chess = require('chess.js');
@@ -187,7 +188,8 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
   }
   // /GETTER
 
-  constructor() {}
+  constructor(private b: BackendService) {}
+
   ngAfterViewInit(): void {
     console.log('ngAfterViewInit chessboard comp', this.lastMove);
   }
@@ -328,7 +330,7 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
       orientation,
     });
     this.removeGreySquares();
-    let newMove = new Chess(this.gamePosition).move({
+    const newMove = new Chess(this.gamePosition).move({
       from: source,
       to: target,
       promotion: 'q',
@@ -336,7 +338,7 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
     console.log('ISLEGAL', newMove);
     if (source === target || target === 'offboard' || newMove === null) {
       console.warn('bad drop');
-      return 'snapback'
+      return 'snapback';
     }
     this._position = newPos;
     // TODO check promotion

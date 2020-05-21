@@ -18,6 +18,8 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { UserModule } from './user/user.module';
 import { UserListComponent } from './userlist/userlist.component';
+import { TodoModule } from './todo/todo.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [

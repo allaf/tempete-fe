@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     //   return;
     // } else {
     //   console.log('after',chess.ascii(), chess.fen());
-      
+
     // }
   }
 
