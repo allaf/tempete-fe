@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, share, tap } from 'rxjs/operators';
 import { BackendService } from '../backend.service';
-import { Game } from '../model/game.model';
+import { Game, Variant } from '../model/game.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,8 +30,8 @@ export class GameService {
     return this.backendService.delete('/game/' + gameId).pipe(tap());
   }
 
-  addGame() {
-    return this.backendService.post('/game', null);
+  addGame(variant: Variant = Variant.CLASSIC) {
+    return this.backendService.post('/game', { variant });
   }
 
   getGame(id: string): Observable<Game> {
@@ -41,5 +41,4 @@ export class GameService {
   getAllGames(): Observable<Game[]> {
     return this.games;
   }
-
 }

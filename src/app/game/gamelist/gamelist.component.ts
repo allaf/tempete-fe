@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { Game, GameStatus } from '../../model/game.model';
+import { UtilsService } from 'src/app/utils/utils.service';
+import { Game, GameStatus, Variant } from '../../model/game.model';
 import { GameService } from '../game.service';
 
 @Component({
@@ -13,7 +15,10 @@ import { GameService } from '../game.service';
 export class GamelistComponent implements OnInit {
   gamesSubject = new BehaviorSubject<Game[]>(null);
 
+  variant: Variant = Variant.CLASSIC;
+
   constructor(
+    private utils: UtilsService,
     private gameService: GameService,
     private router: Router,
     private authenticationService: AuthenticationService
@@ -24,13 +29,16 @@ export class GamelistComponent implements OnInit {
   }
 
   getGames() {
-    this.gameService.getAllGames().subscribe((value) => {
-      this.gamesSubject.next(value);
-    });
+    this.gameService
+      .getAllGames()
+      .pipe(map((games) => games.map(this.utils.asGame)))
+      .subscribe((value) => {
+        this.gamesSubject.next(value);
+      });
   }
 
   addGame() {
-    this.gameService.addGame().subscribe((g) => {
+    this.gameService.addGame(this.variant).subscribe((g) => {
       this.getGames();
     });
   }

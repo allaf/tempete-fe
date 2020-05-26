@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BackendService } from '../backend.service';
 import { TodoDto } from '../model/todo.model';
-import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -9,7 +8,6 @@ export class TodoService {
   constructor(private backend: BackendService) {}
 
   addTodo(todo: TodoDto) {
-    console.log('compl?', todo.completed);
     return this.backend.post('/todo', todo);
   }
 
@@ -22,7 +20,7 @@ export class TodoService {
   }
 
   findAll(): Observable<TodoDto[]> {
-    return this.backend.get('/todo/find').pipe();
+    return this.backend.get('/todo/find');
   }
 
   getById(id: string) {

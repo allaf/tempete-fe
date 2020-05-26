@@ -20,6 +20,7 @@ import { UserModule } from './user/user.module';
 import { UserListComponent } from './userlist/userlist.component';
 import { TodoModule } from './todo/todo.module';
 import { RouterModule } from '@angular/router';
+import { TakenPiecesComponent } from './game/taken-pieces/taken-pieces.component';
 
 @NgModule({
   imports: [
@@ -53,6 +54,7 @@ import { RouterModule } from '@angular/router';
     GamelistComponent,
     GameComponent,
     UserListComponent,
+    TakenPiecesComponent,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -1,11 +1,12 @@
-// export enum TodoCat {
-//   BE = 'BE',
-//   FE = 'FE',
-// }
+export enum TodoCat {
+  BE = 'BE',
+  FE = 'FE',
+}
 
 export class TodoDto {
   id: string;
-  completed = false;
-  todo: string;
+  // tslint:disable-next-line: variable-name
   _id: string;
+  completed: boolean;
+  todo: string;
 }

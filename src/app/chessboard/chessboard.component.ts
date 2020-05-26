@@ -33,7 +33,7 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
   private _moveSpeed: any = 200;
   private _snapbackSpeed: any = 500;
   private _snapSpeed: any = 100;
-  private _sparePieces = false;
+  private _sparePieces = true;
   private _move: SquareMove;
 
   @Output() animationChange = new EventEmitter<boolean>();
@@ -335,8 +335,8 @@ export class ChessboardComponent implements OnInit, AfterViewInit {
       to: target,
       promotion: 'q',
     });
-    console.log('ISLEGAL', newMove);
-    if (source === target || target === 'offboard' || newMove === null) {
+    console.log('ISLEGAL?', newMove);
+    if (source === target || target === 'offboard' /*|| newMove === null*/) {
       console.warn('bad drop');
       return 'snapback';
     }

@@ -2,8 +2,10 @@
   <div class="container pt-3">
     <div class="row">
       <div class="col">
-        lockpieces ?{{ lockPieces }}
-        {{ game.fenPointer < game.fenHistory.length - 1 }}
+        <tempete-taken-pieces
+          [width]="width / 8"
+          [pieces]="game.getTakenPiecesBy(playerColor === 'w' ? 'b' : 'w')"
+        ></tempete-taken-pieces>
         <ng2-chessboard
           (moveMade)="moveMade($event)"
           [gamePosition]="game.position"
@@ -12,11 +14,15 @@
           [lastMove]="game.move"
           [player]="playerColor"
           [turn]="game.turn"
-          [width]="'400px'"
+          [width]="width + 'px'"
           [position]="game.position"
           [draggable]="true"
           [orientation]="orientation"
         ></ng2-chessboard>
+        <tempete-taken-pieces
+          [width]="width / 8"
+          [pieces]="game.getTakenPiecesBy(playerColor)"
+        ></tempete-taken-pieces>
       </div>
       <div class="col">
         <div style="padding-left: 20px;">
