@@ -6,10 +6,14 @@ import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { LoggerTestingModule } from 'ngx-logger/testing';
 import { SocketIoModule, Socket } from 'ngx-socket-io';
 import { of } from 'rxjs';
+// import { Chess } from 'chess.js';
 
 const SocketMock = {
   fromEvent: (x) => of({}),
 };
+
+
+// const Chess = require('chess.js');
 
 describe('GameComponent', () => {
   let component: GameComponent;
@@ -25,7 +29,10 @@ describe('GameComponent', () => {
         SocketIoModule,
       ],
       declarations: [GameComponent],
-      providers: [{ provide: Socket, useValue: SocketMock }]
+      providers: [
+        { provide: Socket, useValue: SocketMock },
+        // { provide: Chess, useValue: {} },
+      ],
     }).compileComponents();
   }));
 

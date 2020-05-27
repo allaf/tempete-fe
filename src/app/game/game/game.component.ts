@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Scavenger } from '@wishtack/rx-scavenger';
 import { Socket } from 'ngx-socket-io';
@@ -7,11 +7,9 @@ import { catchError, filter, map, tap } from 'rxjs/operators';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Game, GameStatus, MoveMade, Turn } from 'src/app/model/game.model';
 import { GameService } from '../game.service';
-// import { Chess } from 'chess.js';
-
+import { UtilsService } from 'src/app/utils/utils.service';
+// import { Chess, Square } from 'chess.js';
 const Chess = require('chess.js');
-
-declare const ChessBoard: any; // TODO put in game service
 
 @Component({
   selector: 'app-game',
@@ -22,7 +20,7 @@ export class GameComponent implements OnInit, OnDestroy {
   readonly connectedUser = this.auth.getConnectedUser();
 
   private scavenger = new Scavenger(this);
-  private mapAsGame = map((res) => Object.assign(new Game(), res as Game));
+  // private mapAsGame = map((res) => Object.assign(new Game(), res as Game)); // TODO facto dans utils
 
   gameSubject = new BehaviorSubject<Game>(null);
   gameChangeObs;
@@ -33,10 +31,12 @@ export class GameComponent implements OnInit, OnDestroy {
 
   chess = new Chess();
 
-  randFen = '4k1nr/4bppp/8/8/8/8/P3K1PP/R6R b - - 0 16';
   lockPieces = false;
 
+  width = 350;
+
   constructor(
+    private utils: UtilsService,
     private router: Router,
     private auth: AuthenticationService,
     private route: ActivatedRoute,
@@ -47,7 +47,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.game.position = g.position;
 
       if (this.chess.load(g.position)) {
-        console.log(this.chess.ascii());
+        // console.log(this.chess.ascii());
       } else {
         console.error('chessjs: cannot load position');
       }
@@ -65,7 +65,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.gameChangeObs = this.socket.fromEvent('gameChange').pipe(
       this.scavenger.collect(),
-      this.mapAsGame,
+      this.utils.mapAsGame,
       tap((x: Game) => this.handleGameChange(x))
     );
 
@@ -90,37 +90,34 @@ export class GameComponent implements OnInit, OnDestroy {
     return this.game.turn === this.getPlayerColor();
   }
 
-  // moveMade(move: MoveMade) {
-  //   // Update the game and send it to the server
-  //   const newFen = ChessBoard.objToFen(move.newPos);
-  //   console.log('move', move, newFen);
-  //   this.game.changeTurn();
-  //   this.game.fenHistory.push(newFen);
-  //   this.game.fenPointer++;
-  //   this.game.position = newFen;
-  //   this.game.move = { source: move.source, target: move.target };
-
-  //   // Prevenir les autres clients et le serveur du move via WS
-  //   this.socket.emit('gameChange', this.game);
-  // }
   moveMade(move: MoveMade) {
     // Update the game and send it to the server
     console.log('the move', move);
-    console.log('s', this.chess.ascii());
+    // console.log('s', this.chess.ascii());
+
+    const takenPiece = new Chess(this.chess.fen()).get(move.target);
+
     const moveRes = this.chess.move({
       from: move.source,
       to: move.target,
       promotion: 'q',
     });
+
     if (moveRes === null) {
       console.error('chessjs cannot make move');
       return;
-    } else {
-      console.log('move chessjs ok');
     }
 
     const newFen = this.chess.fen();
     console.log('move', move, newFen);
+
+    if (takenPiece) {
+      this.game.takenPieces.push({
+        onMove: this.game.fenPointer + 1,
+        piece: takenPiece,
+      });
+    }
+
     this.game.changeTurn();
     this.game.fenHistory.push(newFen);
     this.game.fenPointer++;
@@ -191,7 +188,7 @@ export class GameComponent implements OnInit, OnDestroy {
           }
           return of(null);
         }),
-        this.mapAsGame
+        this.utils.mapAsGame
       )
       .subscribe((g: Game) => {
         // TODO init ?

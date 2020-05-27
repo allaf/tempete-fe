@@ -1,0 +1,27 @@
+<!-- <ul class="list-group list-group-horizontal">
+  <li *ngFor="let p of pieces" class="list-group-item">
+    <img [src]="getImg(p)" [width]="width" />
+  </li>
+</ul> -->
+
+<ul style="list-style-type: none;">
+  <li *ngFor="let p of pieces" style="display: inline-block;">
+    <img
+      truc="bidule"
+      [src]="getImg(p)"
+      [width]="width"
+      draggable="true"
+      (dragstart)="drag($event)"
+    />
+  </li>
+</ul>
+
+<!-- 
+<img
+    src="https://images.pexels.com/photos/658687/pexels-photo-658687.jpeg?auto=compress&cs=tinysrgb&h=350"
+    draggable="true"
+    (dragstart)="drag($event)"
+    id="drag1"
+    width="88"
+    height="31"
+  /> -->

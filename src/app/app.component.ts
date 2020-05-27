@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
   async logout() {
     const res = await this.authenticationService.logout().toPromise();
     if (res) {
-      this.logger.debug('logout fini OK je redirige vers login');
+      this.logger.info('logout fini OK je redirige vers login');
       this.router.navigate(['/login']);
     } else {
       this.logger.debug('logout fini ERROR je fais RIEN');

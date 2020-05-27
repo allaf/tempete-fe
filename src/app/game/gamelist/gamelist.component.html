@@ -4,9 +4,21 @@
       parties
     </div>
     <div class="col-sm">
-      <a class="" routerLink="/"  (click)="refreshList()">Refresh</a>
+      <a class="" routerLink="/" (click)="refreshList()">Refresh</a>
     </div>
-    <div class="col-sm" style="text-align:'right'">
+    <div class="col-sm" style="text-align: 'right';">
+      <div class="form-group">
+        <label for="variant">Variant</label>
+        <select class="form-control" name="variant" [(ngModel)]="variant">
+          <option [value]="'CLASSIC'" [selected]="variant === 'CLASSIC'"
+            >Classic</option
+          >
+          <option [value]="'TEMPETE'" [selected]="variant === 'TEMPETE'"
+            >Tempete</option
+          >
+        </select>
+      </div>
+
       <button (click)="addGame()">Créer partie</button>
     </div>
   </div>
@@ -21,7 +33,13 @@
       <div class="container">
         <div class="row">
           <div class="col-10">
-            {{ g.name }} - ({{g.status}})
+            <img *ngIf="g.isClassic()" src="/assets/pieces/cburnett/wK.svg" />
+            <img
+              *ngIf="!g.isClassic()"
+              src="/assets/tempete.jpg"
+              style="height: 40px; width: 40px;"
+            />
+            {{ g.name }} - ({{ g.status }})
           </div>
           <div
             *ngIf="canJoin(g)"
@@ -34,14 +52,20 @@
           <div
             *ngIf="canSee(g)"
             class="col"
-            [routerLink]="'/game/'+g.id" 
+            [routerLink]="'/game/' + g.id"
             style="cursor: pointer;"
           >
             <u>Jouer</u>
           </div>
 
-          <div class="col" *ngIf="canDelete(g)"  (click)="deleteGame(g.id)"
-          style="cursor: pointer;">suppr</div>
+          <div
+            class="col"
+            *ngIf="canDelete(g)"
+            (click)="deleteGame(g.id)"
+            style="cursor: pointer;"
+          >
+            suppr
+          </div>
         </div>
       </div>
     </li>
