@@ -7,6 +7,7 @@ import { AlertService } from './alert.service';
   selector: 'alert',
   template:
     '<div *ngIf="message" [ngClass]="message.cssClass">{{message.text}}</div>',
+    styleUrls: ['./alert.css'],
 })
 export class AlertComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
